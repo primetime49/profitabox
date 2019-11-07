@@ -1,3 +1,12 @@
+from base import *
+from bs4 import BeautifulSoup
+import urllib
+import requests
+import re
+import csv
+import calendar
+import time
+
 filename = input('Filename (without .csv): ')
 with open(filename+'.csv', 'w' , newline='') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)

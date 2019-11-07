@@ -1,3 +1,12 @@
+from base import *
+from bs4 import BeautifulSoup
+import urllib
+import requests
+import re
+import csv
+import calendar
+import time
+
 filename = input('Filename (without .csv): ')
 with open(filename+'.csv', 'r',encoding = "ISO-8859-1") as f:
     reader = csv.reader(f)
