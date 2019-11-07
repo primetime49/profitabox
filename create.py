@@ -5,7 +5,7 @@ with open(filename+'.csv', 'w' , newline='') as myfile:
 start_time = time.time()
 year = int(input('From year: '))
 until = int(input('Until year: '))
-while year < until:
+while year <= until:
     count = 0
     year_time = time.time()
     page = requests.get("https://www.boxofficemojo.com/year/"+str(year)+'/?grossesOption=totalGrosses')
