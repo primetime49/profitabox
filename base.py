@@ -30,6 +30,16 @@ def find_movie(name,year, movies):
             return movie
     return Movie('','',0)
 
+def find_all_movie(movie,ml):
+    movies = []
+    try:
+        for m in ml:
+            if movie.lower() in m.name.lower():
+                movies.append(m)
+        return movies
+    except:
+        return movies
+
 class Movie:
     def __init__(self, name, href, year):
         self.name = name
@@ -75,6 +85,7 @@ class Movie:
         tbp += 'Domestic: ${:0,.2f}'.format(self.dom)+'\n'
         tbp += 'Foregin (ex. China): ${:0,.2f}'.format(self.inter)+'\n'
         tbp += 'China: ${:0,.2f}'.format(self.china)+'\n'
+        tbp += 'Indonesia: ${:0,.2f}'.format(self.indo)+'\n'
         tbp += 'Total: ${:0,.2f}'.format(self.dom+self.inter+self.china)+'\n'
         tbp += 'Budget: ${:0,.2f}'.format(self.budget)+'\n'
         tbp += 'Profit: ${:0,.2f}'.format(self.getProfit())+'\n'
