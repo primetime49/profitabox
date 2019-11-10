@@ -1,9 +1,20 @@
 from base import *
 import csv
 from tkinter import *
+import glob
 
-filename = input('Data source (without .csv): ')
-with open(filename+'.csv', 'r',encoding = "ISO-8859-1") as f:
+files = [f for f in glob.glob('*.csv')]
+filenames = []
+
+filenum = 0
+for f in files:
+    filenum += 1
+    print(str(filenum)+'. '+f)
+    filenames.append(f)
+
+filename = int(input('Choose data source (1/2/3/...): '))
+filename = filenames[filename-1]
+with open(filename, 'r') as f:
     reader = csv.reader(f)
     your_list = list(reader)
 
