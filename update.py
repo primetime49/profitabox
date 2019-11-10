@@ -22,28 +22,11 @@ with open(filename, 'r') as f:
     reader = csv.reader(f)
     your_list = list(reader)
 
-movie_list = []
-for m in your_list[1:]:
-    movie = Movie(m[0],m[1],int(m[2]))
-    movie.month = m[3]
-    movie.studio = m[4]
-    movie.rating = m[5]
-    movie.runtime = int(m[6])
-    movie.genres = m[7]
-    movie.theater = int(m[8])
-    movie.opening = int(m[9])
-    movie.dom = int(m[10])
-    movie.inter = int(m[11])
-    movie.china = int(m[12])
-    movie.indo = int(m[13])
-    movie.budget = int(m[15])
-    movie_list.append(movie)
-
-print(len(movie_list))
+movie_list = build_list(your_list)
 
 with open(filename, 'w' , newline='') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-    wr.writerows([['title','href','year','month','studio','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
+    wr.writerows([['title','href','year','month','studio','director','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
 start_time = time.time()
 year = int(input('From year: '))
 until = int(input('Until year: '))
@@ -91,15 +74,21 @@ while year <= until:
                 movie.opening = int(BO_number(titsums.find('span', text = 'Domestic Opening').find_next_sibling().string))
             except:
                 print('No opening numbers for '+movie.name)
+            summary = requests.get(imdb+href)
+            summarys = BeautifulSoup(summary.content, 'html.parser')
             try:
                 movie.budget = int(BO_number(titsums.find('span', text = 'Budget').find_next_sibling().string))
             except:
-                summary = requests.get(imdb+href)
-                summarys = BeautifulSoup(summary.content, 'html.parser')
                 try:
                     movie.budget = int(BO_number(re.search('[0-9,]+',summarys.find('h4', text = 'Budget:').find_parent().get_text()).group()))
                 except:
                     print('No budget reported for '+movie.name)
+            try:
+                dirs = summarys.find('h4', text = re.compile("Director")).find_next_siblings()
+                dirs = list(map(lambda d: d.string, dirs))
+                movie.director = ', '.join(dirs)
+            except:
+                print('No director found for '+movie.name)
             try:
                 movie.month = titsums.find('span', text = 'Earliest Release Date').find_next_sibling().string.split(' ')[0]
             except:
@@ -137,8 +126,7 @@ while year <= until:
     print(str(year)+" --- %s seconds ---\n" % (time.time() - year_time))
     year += 1
 print("Total time --- %s seconds ---" % (time.time() - start_time))
-print(len(movie_list))
 for movie in movie_list:
     with open(filename, 'a' , newline='') as myfile:
         wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-        wr.writerows([[movie.name,movie.href,movie.year,movie.month,movie.studio,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]])
+        wr.writerows([[movie.name,movie.href,movie.year,movie.month,movie.studio,movie.director,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]])

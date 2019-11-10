@@ -10,7 +10,7 @@ import time
 filename = input('Filename (without .csv): ')
 with open(filename+'.csv', 'w' , newline='') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-    wr.writerows([['title','href','year','month','studio','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
+    wr.writerows([['title','href','year','month','studio','director','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
 start_time = time.time()
 year = int(input('From year: '))
 until = int(input('Until year: '))
@@ -54,15 +54,21 @@ while year <= until:
                 movie.opening = int(BO_number(titsums.find('span', text = 'Domestic Opening').find_next_sibling().string))
             except:
                 print('No opening numbers for '+movie.name)
+            summary = requests.get(imdb+href)
+            summarys = BeautifulSoup(summary.content, 'html.parser')
             try:
                 movie.budget = int(BO_number(titsums.find('span', text = 'Budget').find_next_sibling().string))
             except:
-                summary = requests.get(imdb+href)
-                summarys = BeautifulSoup(summary.content, 'html.parser')
                 try:
                     movie.budget = int(BO_number(re.search('[0-9,]+',summarys.find('h4', text = 'Budget:').find_parent().get_text()).group()))
                 except:
                     print('No budget reported for '+movie.name)
+            try:
+                dirs = summarys.find('h4', text = re.compile("Director")).find_next_siblings()
+                dirs = list(map(lambda d: d.string, dirs))
+                movie.director = ', '.join(dirs)
+            except:
+                print('No director found for '+movie.name)
             try:
                 movie.month = titsums.find('span', text = 'Earliest Release Date').find_next_sibling().string.split(' ')[0]
             except:
@@ -96,7 +102,7 @@ while year <= until:
             count += 1
             with open(filename+'.csv', 'a' , newline='') as myfile:
                 wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-                wr.writerows([[movie.name,movie.href,movie.year,movie.month,movie.studio,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]])
+                wr.writerows([[movie.name,movie.href,movie.year,movie.month,movie.studio,movie.director,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]])
         except Exception as e:
             print(e)
             print('Undefined error for '+moviee.string+'\n')

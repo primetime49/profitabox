@@ -30,15 +30,46 @@ def find_movie(name,year, movies):
             return movie
     return Movie('','',0)
 
-def find_all_movie(movie,ml):
+def find_all_movie(query,ml):
     movies = []
     try:
         for m in ml:
-            if movie.lower() in m.name.lower():
+            if query.lower() in m.name.lower():
                 movies.append(m)
+            elif len(query.split(' ')) >= 2:
+                if query.lower() in m.director.lower() or query.lower() in m.studio.lower():
+                    movies.append(m)
+            else:
+                if query.lower() in list(map(lambda d: d.lower(), m.director.replace(',','').split(' '))):
+                    movies.append(m)
+                elif query.lower() in list(map(lambda s: s.lower(), m.studio.split(' '))):
+                    movies.append(m)
+                elif query.lower() in list(map(lambda g: g.lower(), m.genres.split(' '))):
+                    movies.append(m)
+            
         return movies
     except:
         return movies
+
+def build_list(your_list):
+    movie_list = []
+    for m in your_list[1:]:
+        movie = Movie(m[0],m[1],int(m[2]))
+        movie.month = m[3]
+        movie.studio = m[4]
+        movie.director = m[5]
+        movie.rating = m[6]
+        movie.runtime = int(m[7])
+        movie.genres = m[8]
+        movie.theater = int(m[9])
+        movie.opening = int(m[10])
+        movie.dom = int(m[11])
+        movie.inter = int(m[12])
+        movie.china = int(m[13])
+        movie.indo = int(m[14])
+        movie.budget = int(m[16])
+        movie_list.append(movie)
+    return movie_list
 
 class Movie:
     def __init__(self, name, href, year):
@@ -57,6 +88,7 @@ class Movie:
         self.runtime = ''
         self.genres = ''
         self.budget = 0
+        self.director = ''
     
     def setChina(self,china):
         self.china = china
@@ -77,6 +109,7 @@ class Movie:
         tbp = ''
         tbp += '['+self.month+' '+str(self.year)+'] '+(self.name)+'\n'
         tbp += 'Studio: '+self.studio+'\n'
+        tbp += 'Director: '+self.director+'\n'
         tbp += 'Rating: '+self.rating+'\n'
         tbp += 'Runtime: '+str(self.runtime)+' minutes\n'
         tbp += 'Genres: '+self.genres+'\n'

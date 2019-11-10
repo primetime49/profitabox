@@ -18,22 +18,7 @@ with open(filename, 'r') as f:
     reader = csv.reader(f)
     your_list = list(reader)
 
-movie_list = []
-for m in your_list[1:]:
-    movie = Movie(m[0],m[1],int(m[2]))
-    movie.month = m[3]
-    movie.studio = m[4]
-    movie.rating = m[5]
-    movie.runtime = int(m[6])
-    movie.genres = m[7]
-    movie.theater = int(m[8])
-    movie.opening = int(m[9])
-    movie.dom = int(m[10])
-    movie.inter = int(m[11])
-    movie.china = int(m[12])
-    movie.indo = int(m[13])
-    movie.budget = int(m[15])
-    movie_list.append(movie)
+movie_list = build_list(your_list)
 
 root = Tk()
 buttons = []
@@ -43,6 +28,7 @@ showed = 0
 def showMovie(movie):
     title.config(text=movie.name.upper())
     release.config(text='Released on '+movie.month+' '+str(movie.year)+' by Studio '+movie.studio)
+    director.config(text='Directed by {}'.format(movie.director))
     rating.config(text='MPAA Rating: {}'.format(movie.rating))
     runtime.config(text='Runtime: {} minutes'.format(movie.runtime))
     theater.config(text='Max theaters count: {}'.format(movie.theater))
@@ -75,6 +61,9 @@ fields.append(title)
 release = Label(root, text='', anchor='w')
 release.pack(fill='both')
 fields.append(release)
+director = Label(root, text='', anchor='w')
+director.pack(fill='both')
+fields.append(director)
 rating = Label(root, text='', anchor='w')
 rating.pack(fill='both')
 fields.append(rating)
@@ -114,7 +103,7 @@ def getMovies(showed):
     for button in buttons:
         button.destroy()
     search = searchEntry.get()
-    searchResult = find_all_movie(search, movie_list)
+    searchResult = sorted(find_all_movie(search, movie_list),key=lambda m: (m.year,m.dom), reverse=True)
     maxShow = 10+showed
     while showed < maxShow and showed < len(searchResult):
         movie = searchResult[showed]
@@ -127,7 +116,7 @@ def getMovies(showed):
         nextPage.pack(side=RIGHT)
         buttons.append(nextPage)
     if showed > 10:
-        prevPage = Button(root, text='Previous page', command=lambda showed=int((showed-10)/10):getMovies(showed), )
+        prevPage = Button(root, text='Previous page', command=lambda showed=maxShow-20:getMovies(showed), )
         prevPage.pack(side=LEFT)
         buttons.append(prevPage)
 
