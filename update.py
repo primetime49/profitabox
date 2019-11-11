@@ -30,10 +30,19 @@ until = int(input('Until year: '))
 while year <= until:
     count = 0
     year_time = time.time()
-    page = requests.get("https://www.boxofficemojo.com/year/"+str(year)+'/?grossesOption=totalGrosses')
-    soup = BeautifulSoup(page.content, 'html.parser')
-    movies = soup.find_all(href=re.compile("/release"))
-    for moviee in movies:
+    page = ''
+    soup = ''
+    movies = ''
+    try:
+        page = requests.get("https://www.boxofficemojo.com/year/"+str(year)+'/?grossesOption=totalGrosses')
+        soup = BeautifulSoup(page.content, 'html.parser')
+        movies = soup.find_all(href=re.compile("/release"))
+    except Exception as e:
+        print(e)
+        print('Failed to load movies from '+str(year))
+        year += 1
+        continue
+    for moviee in movies[178:181]:
         try:
             movie_time = time.time()
             if BO_number(moviee.find_parent().find_next_siblings()[4].string) < 1000000:
@@ -118,7 +127,13 @@ while year <= until:
             count += 1
         except Exception as e:
             print(e)
-            print('Undefined error for '+moviee.string+'\n')
+            print('Undefined error for '+moviee.string)
+            try:
+                movie_list.remove(movie)
+                print(movie.name+' removed from dataset')
+            except:
+                pass
+            print('\n')
     print('Got '+str(count)+' movies for year '+str(year))
     print(str(year)+" --- %s seconds ---\n" % (time.time() - year_time))
     year += 1
