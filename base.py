@@ -1,10 +1,5 @@
 from bs4 import BeautifulSoup
-import urllib
-import requests
 import re
-import csv
-import calendar
-import time
 base = "https://www.boxofficemojo.com"
 imdb = "https://www.imdb.com"
 movie_list = []
@@ -51,6 +46,9 @@ def find_all_movie(query,ml):
     except:
         return movies
 
+def local_movies(movie_list):
+    return sorted(movie_list,key=lambda m: (m.indo), reverse=True)
+
 def build_list(your_list):
     movie_list = []
     for m in your_list[1:]:
@@ -85,7 +83,7 @@ class Movie:
         self.indo = 0
         self.studio = ''
         self.rating = ''
-        self.runtime = ''
+        self.runtime = 0
         self.genres = ''
         self.budget = 0
         self.director = ''

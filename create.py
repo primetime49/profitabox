@@ -4,7 +4,6 @@ import urllib
 import requests
 import re
 import csv
-import calendar
 import time
 
 filename = input('Filename (without .csv): ')
