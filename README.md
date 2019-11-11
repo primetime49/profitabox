@@ -5,7 +5,7 @@ Is that movie a Boom or Bomb? Find out here.
 This dataset is comprised of movies general data, e.g. Title, Director, Runtime, MPAA Rating, Box Office Revenues, along with their budgets and profit. The profits displayed here are estimated using 50/40/25 rule that's been around. The budgets are directly extracted from web sources (Box Office Mojo and IMDb) wwithout intervention from me, thus I know nothing about their credibility. Feel free to contribute!
 
 ### Prerequisites
-1. [Python](https://https://www.python.org/downloads/)
+1. [Python 3](https://https://www.python.org/downloads/)
 
 ### Steps
 #### Create dataset from scratch
