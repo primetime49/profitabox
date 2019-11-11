@@ -24,9 +24,6 @@ with open(filename, 'r') as f:
 
 movie_list = build_list(your_list)
 
-with open(filename, 'w' , newline='') as myfile:
-    wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-    wr.writerows([['title','href','year','month','studio','director','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
 start_time = time.time()
 year = int(input('From year: '))
 until = int(input('Until year: '))
@@ -126,6 +123,11 @@ while year <= until:
     print(str(year)+" --- %s seconds ---\n" % (time.time() - year_time))
     year += 1
 print("Total time --- %s seconds ---" % (time.time() - start_time))
+
+with open(filename, 'w' , newline='') as myfile:
+    wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+    wr.writerows([['title','href','year','month','studio','director','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
+
 for movie in movie_list:
     with open(filename, 'a' , newline='') as myfile:
         wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
