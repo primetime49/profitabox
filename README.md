@@ -1,12 +1,38 @@
-# profitabox
+# The Profitabox
 Is that movie a Boom or Bomb? Find out here.
 
-Steps:
-1. Create datasets first by running 'python create.py'. Specify filename for the result and years for the movies you want in dataset.
-2. Update regularly by running 'python update.py'. Specify the filename and year. I usually update the datasets every tuesday and only for the current year.
-3. You can reformat the csv results into excel for better reading. Samples can be found in /sample
-4. Run 'python gui.py' to launch the Profitabox GUI. With the GUI you can search movies and look at their data more easily.
+## Description
+This dataset is comprised of movies general data, e.g. Title, Director, Runtime, MPAA Rating, Box Office Revenues, along with their budgets and profit. The profits displayed here are estimated using 50/40/25 rule that's been around. The budgets are directly extracted from web sources (Box Office Mojo and IMDb) wwithout intervention from me, thus I know nothing about their credibility. Feel free to contribute!
 
-Acknowledgements:
+### Prerequisites
+1. [Python](https://https://www.python.org/downloads/)
+
+### Steps
+#### Create dataset from scratch
+1. Install requirements
+```
+pip install -r requirements.txt
+```
+2. Init dataset
+```
+python create.py
+```
+3. Update dataset regularly, if you want. (I usually update them weekly and only for this year's movies)
+```
+python update.py
+```
+4. Run GUI
+```
+python gui.py
+```
+#### Use existing dataset (last updated 11/11/19)
+1. Run GUI
+```
+python gui.py
+```
+
+### Acknowledgements:
 - https://www.boxofficemojo.com/
 - https://www.crummy.com/software/BeautifulSoup/
+
+If you have any questions or feedback, just contact [me](mailto:adityo.anggraito@gmail.com) :)
