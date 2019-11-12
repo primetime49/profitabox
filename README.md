@@ -8,7 +8,7 @@ This dataset is comprised of movies general data, e.g. Title, Director, Runtime,
 1. [Python 3](https://https://www.python.org/downloads/)
 
 ### Steps
-#### Create dataset from scratch
+#### OPTIONAL - Create dataset from scratch
 1. Install requirements
 ```
 pip install -r requirements.txt
@@ -21,12 +21,8 @@ python create.py
 ```
 python update.py
 ```
+#### RECOMMENDED - Use existing dataset (last updated 11/12/19)
 4. Run GUI
-```
-python gui.py
-```
-#### Use existing dataset (last updated 11/11/19)
-1. Run GUI
 ```
 python gui.py
 ```

@@ -42,10 +42,11 @@ while year <= until:
         print('Failed to load movies from '+str(year))
         year += 1
         continue
-    for moviee in movies[178:181]:
+    for moviee in movies:
         try:
             movie_time = time.time()
-            if BO_number(moviee.find_parent().find_next_siblings()[4].string) < 1000000:
+            dom = BO_number(moviee.find_parent().find_next_siblings()[4].string)
+            if dom < 1000000:
                 print(str(year)+' movie has reached sub-1M')
                 break
             if moviee.find_next_sibling() != None:
@@ -56,6 +57,9 @@ while year <= until:
                 print(moviee.string+' is new movie')
                 movie = Movie(moviee.string, '',year)
                 movie_list.append(movie)
+            elif dom == movie.dom:
+                print(moviee.string+' has no revenue update\n')
+                continue
             try:
                 movie.theater = int(moviee.find_parent().find_next_siblings()[5].string.replace(',',''))
             except:
