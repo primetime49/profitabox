@@ -14,7 +14,7 @@ for f in files:
 
 filename = int(input('Choose data source (1/2/3/...): '))
 filename = filenames[filename-1]
-with open(filename, 'r') as f:
+with open(filename, 'r', encoding = 'ISO-8859-1') as f:
     reader = csv.reader(f)
     your_list = list(reader)
 
@@ -24,6 +24,17 @@ root = Tk()
 buttons = []
 fields = []
 showed = 0
+sortBy = 'Year'
+
+def sortMovies(searchRaw):
+    if sortBy == 'Year':
+        return sorted(searchRaw,key=lambda m: (m.year,m.dom), reverse=True)
+    elif sortBy == 'Domestic':
+        return sorted(searchRaw,key=lambda m: (m.dom,m.year), reverse=True)
+    elif sortBy == 'Worldwide':
+        return sorted(searchRaw,key=lambda m: (m.getTotal(),m.year), reverse=True)
+    elif sortBy == 'Profit':
+        return sorted(searchRaw,key=lambda m: (m.getProfit(),m.year), reverse=True)
 
 def showMovie(movie):
     title.config(text=movie.name.upper())
@@ -51,10 +62,19 @@ def emptyPage():
 
 searchLabel = Label(root, text='Enter the movie:')
 searchLabel.pack()
-searchEntry = Entry(root, width =50)
-searchEntry.pack()
-searchButt = Button(root, text='SEARCH', command=lambda:getMovies(showed))
-searchButt.pack()
+searchFrame = Frame(root)
+searchFrame.pack()
+searchEntry = Entry(searchFrame, width =50)
+searchEntry.pack(side=LEFT)
+sortVar = StringVar(root)
+choices = {'Year','Domestic','Worldwide','Profit'}
+sortVar.set('Year')
+sortMenu = OptionMenu(root, sortVar, *choices)
+searchButt = Button(searchFrame, text='SEARCH', command=lambda:getMovies(showed))
+searchButt.pack(side=LEFT)
+sortLabel = Label(root, text='Sort by:')
+sortLabel.pack()
+sortMenu.pack()
 title = Label(root, text='', anchor='w')
 title.pack(fill='both')
 fields.append(title)
@@ -98,12 +118,21 @@ profit = Label(root, text='', anchor='w')
 profit.pack(fill='both')
 fields.append(profit)
 
+def change_dropdown(*args):
+    global sortBy
+    sortBy = sortVar.get()
+    getMovies(showed)
+
+# link function to change dropdown
+sortVar.trace('w', change_dropdown)
+
 def getMovies(showed):
     emptyPage()
     for button in buttons:
         button.destroy()
     search = searchEntry.get()
-    searchResult = sorted(find_all_movie(search, movie_list),key=lambda m: (m.year,m.dom), reverse=True)
+    searchRaw = find_all_movie(search, movie_list)
+    searchResult = sortMovies(searchRaw)
     maxShow = 10+showed
     while showed < maxShow and showed < len(searchResult):
         movie = searchResult[showed]
