@@ -28,7 +28,7 @@ sortBy = 'Year'
 
 def sortMovies(searchRaw):
     if sortBy == 'Year':
-        return sorted(searchRaw,key=lambda m: (m.year,m.dom), reverse=True)
+        return sorted(searchRaw,key=lambda m: (m.year,m.month,m.dom), reverse=True)
     elif sortBy == 'Domestic':
         return sorted(searchRaw,key=lambda m: (m.dom,m.year), reverse=True)
     elif sortBy == 'Worldwide':
@@ -38,7 +38,7 @@ def sortMovies(searchRaw):
 
 def showMovie(movie):
     title.config(text=movie.name.upper())
-    release.config(text='Released on '+movie.month+' '+str(movie.year)+' by Studio '+movie.studio)
+    release.config(text='Released on '+get_month(movie.month)+' '+str(movie.year)+' by Studio '+movie.studio)
     director.config(text='Directed by {}'.format(movie.director))
     rating.config(text='MPAA Rating: {}'.format(movie.rating))
     runtime.config(text='Runtime: {} minutes'.format(movie.runtime))

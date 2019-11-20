@@ -1,8 +1,18 @@
 from bs4 import BeautifulSoup
 import re
+import calendar
 base = "https://www.boxofficemojo.com"
 imdb = "https://www.imdb.com"
 movie_list = []
+
+def get_month(month):
+    try:
+        try:
+            return calendar.month_name[month]
+        except:
+            return list(calendar.month_name).index(month)
+    except:
+        return ''
 
 def BO_number(bo):
     return int(bo.replace('$','').replace(',','').replace('\xa0',''))
@@ -53,7 +63,7 @@ def build_list(your_list):
     movie_list = []
     for m in your_list[1:]:
         movie = Movie(m[0],m[1],int(m[2]))
-        movie.month = m[3]
+        movie.month = get_month(m[3])
         movie.studio = m[4]
         movie.director = m[5]
         movie.rating = m[6]
@@ -105,7 +115,7 @@ class Movie:
         
     def __str__(self):
         tbp = ''
-        tbp += '['+self.month+' '+str(self.year)+'] '+(self.name)+'\n'
+        tbp += '['+get_month(self.month)+' '+str(self.year)+'] '+(self.name)+'\n'
         tbp += 'Studio: '+self.studio+'\n'
         tbp += 'Director: '+self.director+'\n'
         tbp += 'Rating: '+self.rating+'\n'

@@ -18,7 +18,7 @@ for f in files:
 
 filename = int(input('Choose data source (1/2/3/...): '))
 filename = filenames[filename-1]
-with open(filename, 'r') as f:
+with open(filename, 'r', encoding = 'ISO-8859-1') as f:
     reader = csv.reader(f)
     your_list = list(reader)
 
@@ -100,7 +100,7 @@ while year <= until:
             except:
                 print('No director found for '+movie.name)
             try:
-                movie.month = titsums.find('span', text = 'Earliest Release Date').find_next_sibling().string.split(' ')[0]
+                movie.month = get_month(titsums.find('span', text = 'Earliest Release Date').find_next_sibling().string.split(' ')[0])
             except:
                 print('No release month for '+movie.name)
             try:
@@ -143,11 +143,11 @@ while year <= until:
     year += 1
 print("Total time --- %s seconds ---" % (time.time() - start_time))
 
-with open(filename, 'w' , newline='') as myfile:
+with open(filename, 'w' , newline='', encoding = 'ISO-8859-1') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
     wr.writerows([['title','href','year','month','studio','director','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
 
 for movie in movie_list:
-    with open(filename, 'a' , newline='') as myfile:
+    with open(filename, 'a' , newline='', encoding = 'ISO-8859-1') as myfile:
         wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-        wr.writerows([[movie.name,movie.href,movie.year,movie.month,movie.studio,movie.director,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]])
+        wr.writerows([[movie.name,movie.href,movie.year,get_month(movie.month),movie.studio,movie.director,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]])
