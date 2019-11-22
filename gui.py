@@ -25,16 +25,29 @@ buttons = []
 fields = []
 showed = 0
 sortBy = 'Year'
+minTC = 0
+maxTC = 10000
+desc = True
+minYear = 0
+maxYear = 10000
 
 def sortMovies(searchRaw):
     if sortBy == 'Year':
-        return sorted(searchRaw,key=lambda m: (m.year,m.month,m.dom), reverse=True)
+        return sorted(searchRaw,key=lambda m: (m.year,m.month,m.dom), reverse=desc)
     elif sortBy == 'Domestic':
-        return sorted(searchRaw,key=lambda m: (m.dom,m.year), reverse=True)
+        return sorted(searchRaw,key=lambda m: (m.dom,m.year), reverse=desc)
     elif sortBy == 'Worldwide':
-        return sorted(searchRaw,key=lambda m: (m.getTotal(),m.year), reverse=True)
+        return sorted(searchRaw,key=lambda m: (m.getTotal(),m.year), reverse=desc)
     elif sortBy == 'Profit':
-        return sorted(searchRaw,key=lambda m: (m.getProfit(),m.year), reverse=True)
+        return sorted(searchRaw,key=lambda m: (m.getProfit(),m.year), reverse=desc)
+
+def filterMovies(searchRaw):
+    newResult = []
+    for sr in searchRaw:
+        if sr.theater >= minTC and sr.theater <= maxTC:
+            if sr.year >= minYear and sr.year <= maxYear:
+                newResult.append(sr)
+    return newResult
 
 def showMovie(movie):
     title.config(text=movie.name.upper())
@@ -66,15 +79,53 @@ searchFrame = Frame(root)
 searchFrame.pack()
 searchEntry = Entry(searchFrame, width =50)
 searchEntry.pack(side=LEFT)
-sortVar = StringVar(root)
+
+sortFrame = Frame(root)
+sortVar = StringVar(sortFrame)
+
 choices = {'Year','Domestic','Worldwide','Profit'}
 sortVar.set('Year')
-sortMenu = OptionMenu(root, sortVar, *choices)
+sortMenu = OptionMenu(sortFrame, sortVar, *choices)
+sortMenu.pack(side=LEFT)
+
+dirVar = StringVar(sortFrame)
+choices = {'UP', 'DOWN'}
+dirVar.set('DOWN')
+dirMenu = OptionMenu(sortFrame, dirVar, *choices)
+dirMenu.pack(side=LEFT)
+
 searchButt = Button(searchFrame, text='SEARCH', command=lambda:getMovies(showed))
 searchButt.pack(side=LEFT)
+
 sortLabel = Label(root, text='Sort by:')
 sortLabel.pack()
-sortMenu.pack()
+sortFrame.pack()
+
+filterFrame = Frame(root)
+filterFrame.pack()
+minLabel = Label(filterFrame, text='Theaters count:', anchor='w')
+minLabel.pack(side=LEFT)
+minEntry = Entry(filterFrame, width = 5)
+minEntry.pack(side=LEFT)
+stripLabel = Label(filterFrame, text=' - ', anchor='w')
+stripLabel.pack(side=LEFT)
+maxEntry = Entry(filterFrame, width = 5)
+maxEntry.pack(side=LEFT)
+
+yearFrame = Frame(root)
+yearFrame.pack()
+yearLabel = Label(yearFrame, text='Release year:', anchor='w')
+yearLabel.pack(side=LEFT)
+mnyEntry = Entry(yearFrame, width = 5)
+mnyEntry.pack(side=LEFT)
+syLabel = Label(yearFrame, text=' - ', anchor='w')
+syLabel.pack(side=LEFT)
+mxyEntry = Entry(yearFrame, width = 5)
+mxyEntry.pack(side=LEFT)
+
+filterButton = Button(root, text='Filter', command=lambda:filterTC())
+filterButton.pack()
+
 title = Label(root, text='', anchor='w')
 title.pack(fill='both')
 fields.append(title)
@@ -119,12 +170,40 @@ profit.pack(fill='both')
 fields.append(profit)
 
 def change_dropdown(*args):
-    global sortBy
+    global sortBy, desc
     sortBy = sortVar.get()
+    if dirVar.get() == 'DOWN':
+        desc = True
+    else:
+       desc = False
+    getMovies(showed)
+
+def filterTC():
+    global minTC, maxTC, minYear, maxYear
+
+    if minEntry.get().isdigit():
+        minTC = int(minEntry.get())
+    else:
+        minTC = 0
+    if maxEntry.get().isdigit():
+        maxTC = int(maxEntry.get())
+    else:
+        maxTC = 10000
+    
+    if mnyEntry.get().isdigit():
+        minYear = int(mnyEntry.get())
+    else:
+        minYear = 0
+    if mxyEntry.get().isdigit():
+        maxYear = int(mxyEntry.get())
+    else:
+        maxYear = 10000
+    
     getMovies(showed)
 
 # link function to change dropdown
 sortVar.trace('w', change_dropdown)
+dirVar.trace('w', change_dropdown)
 
 def getMovies(showed):
     emptyPage()
@@ -133,6 +212,7 @@ def getMovies(showed):
     search = searchEntry.get()
     searchRaw = find_all_movie(search, movie_list)
     searchResult = sortMovies(searchRaw)
+    searchResult = filterMovies(searchResult)
     maxShow = 10+showed
     while showed < maxShow and showed < len(searchResult):
         movie = searchResult[showed]
