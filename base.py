@@ -64,18 +64,19 @@ def build_list(your_list):
     for m in your_list[1:]:
         movie = Movie(m[0],m[1],int(m[2]))
         movie.month = get_month(m[3])
-        movie.studio = m[4]
-        movie.director = m[5]
-        movie.rating = m[6]
-        movie.runtime = int(m[7])
-        movie.genres = m[8]
-        movie.theater = int(m[9])
-        movie.opening = int(m[10])
-        movie.dom = int(m[11])
-        movie.inter = int(m[12])
-        movie.china = int(m[13])
-        movie.indo = int(m[14])
-        movie.budget = int(m[16])
+        movie.date = int(m[4])
+        movie.studio = m[5]
+        movie.director = m[6]
+        movie.rating = m[7]
+        movie.runtime = int(m[8])
+        movie.genres = m[9]
+        movie.theater = int(m[10])
+        movie.opening = int(m[11])
+        movie.dom = int(m[12])
+        movie.inter = int(m[13])
+        movie.china = int(m[14])
+        movie.indo = int(m[15])
+        movie.budget = int(m[17])
         movie_list.append(movie)
     return movie_list
 
@@ -85,6 +86,7 @@ class Movie:
         self.href = href
         self.year = year
         self.month = ''
+        self.date = 0
         self.opening = 0
         self.theater = 0
         self.dom = 0
@@ -115,7 +117,7 @@ class Movie:
         
     def __str__(self):
         tbp = ''
-        tbp += '['+get_month(self.month)+' '+str(self.year)+'] '+(self.name)+'\n'
+        tbp += '['+str(self.date)+' '+get_month(self.month)+' '+str(self.year)+'] '+(self.name)+'\n'
         tbp += 'Studio: '+self.studio+'\n'
         tbp += 'Director: '+self.director+'\n'
         tbp += 'Rating: '+self.rating+'\n'

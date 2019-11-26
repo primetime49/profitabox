@@ -33,7 +33,7 @@ maxYear = 10000
 
 def sortMovies(searchRaw):
     if sortBy == 'Year':
-        return sorted(searchRaw,key=lambda m: (m.year,m.month,m.dom), reverse=desc)
+        return sorted(searchRaw,key=lambda m: (m.year,m.month,m.date,m.dom), reverse=desc)
     elif sortBy == 'Domestic':
         return sorted(searchRaw,key=lambda m: (m.dom,m.year), reverse=desc)
     elif sortBy == 'Worldwide':
@@ -51,7 +51,7 @@ def filterMovies(searchRaw):
 
 def showMovie(movie):
     title.config(text=movie.name.upper())
-    release.config(text='Released on '+get_month(movie.month)+' '+str(movie.year)+' by Studio '+movie.studio)
+    release.config(text='Released on '+str(movie.date)+' '+get_month(movie.month)+' '+str(movie.year)+' by Studio '+movie.studio)
     director.config(text='Directed by {}'.format(movie.director))
     rating.config(text='MPAA Rating: {}'.format(movie.rating))
     runtime.config(text='Runtime: {} minutes'.format(movie.runtime))

@@ -6,6 +6,7 @@ import re
 import csv
 import time
 import glob
+import calendar
 
 files = [f for f in glob.glob('*.csv')]
 filenames = []
@@ -64,6 +65,14 @@ while year <= until:
                 movie.theater = int(moviee.find_parent().find_next_siblings()[5].string.replace(',',''))
             except:
                 print('No theater count for '+movie.name)
+            try:
+                movie.month = list(calendar.month_abbr).index(moviee.find_parent().find_next_siblings()[9].string.split(' ')[0])
+            except:
+                print('No release month for '+movie.name)
+            try:
+                movie.date = int(moviee.find_parent().find_next_siblings()[9].string.split(' ')[1])
+            except:
+                print('Failed to get release date for '+movie.name)
             detail = requests.get(base+moviee.get('href'))
             details = BeautifulSoup(detail.content, 'html.parser')
             href = details.find(class_='a-link-normal mojo-title-link refiner-display-highlight').get('href')
@@ -99,10 +108,6 @@ while year <= until:
                 movie.director = ', '.join(dirs)
             except:
                 print('No director found for '+movie.name)
-            try:
-                movie.month = get_month(titsums.find('span', text = 'Earliest Release Date').find_next_sibling().string.split(' ')[0])
-            except:
-                print('No release month for '+movie.name)
             try:
                 movie.rating = titsums.find('span', text = 'MPAA').find_next_sibling().string
             except:
@@ -145,9 +150,9 @@ print("Total time --- %s seconds ---" % (time.time() - start_time))
 
 with open(filename, 'w' , newline='', encoding = 'ISO-8859-1') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-    wr.writerows([['title','href','year','month','studio','director','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
+    wr.writerows([['title','href','year','month','date','studio','director','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
 
 for movie in movie_list:
     with open(filename, 'a' , newline='', encoding = 'ISO-8859-1') as myfile:
         wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-        wr.writerows([[movie.name,movie.href,movie.year,get_month(movie.month),movie.studio,movie.director,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]])
+        wr.writerows([[movie.name,movie.href,movie.year,get_month(movie.month),movie.date,movie.studio,movie.director,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]])
