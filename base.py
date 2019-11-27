@@ -42,10 +42,14 @@ def find_all_movie(query,ml):
             if query.lower() in m.name.lower():
                 movies.append(m)
             elif len(query.split(' ')) >= 2:
-                if query.lower() in m.director.lower() or query.lower() in m.studio.lower():
+                if query.lower() in m.director.lower() or query.lower() in m.studio.lower() or query.lower() in m.cast.lower() or query.lower() in m.prod.lower():
                     movies.append(m)
             else:
                 if query.lower() in list(map(lambda d: d.lower(), m.director.replace(',','').split(' '))):
+                    movies.append(m)
+                elif query.lower() in list(map(lambda d: d.lower(), m.cast.replace(',','').split(' '))):
+                    movies.append(m)
+                elif query.lower() in list(map(lambda d: d.lower(), m.prod.replace(',','').split(' '))):
                     movies.append(m)
                 elif query.lower() in list(map(lambda s: s.lower(), m.studio.split(' '))):
                     movies.append(m)
@@ -55,6 +59,13 @@ def find_all_movie(query,ml):
         return movies
     except:
         return movies
+
+def clean_director(director):
+    found = re.findall(', \|, [0-9]+ more credit',director)
+    if len(found) > 0:
+        return director.replace(found[0],'')
+    else:
+        return director
 
 def local_movies(movie_list):
     return sorted(movie_list,key=lambda m: (m.indo), reverse=True)
@@ -66,17 +77,19 @@ def build_list(your_list):
         movie.month = get_month(m[3])
         movie.date = int(m[4])
         movie.studio = m[5]
-        movie.director = m[6]
-        movie.rating = m[7]
-        movie.runtime = int(m[8])
-        movie.genres = m[9]
-        movie.theater = int(m[10])
-        movie.opening = int(m[11])
-        movie.dom = int(m[12])
-        movie.inter = int(m[13])
-        movie.china = int(m[14])
-        movie.indo = int(m[15])
-        movie.budget = int(m[17])
+        movie.prod = m[6]
+        movie.director = m[7]
+        movie.cast = m[8]
+        movie.rating = m[9]
+        movie.runtime = int(m[10])
+        movie.genres = m[11]
+        movie.theater = int(m[12])
+        movie.opening = int(m[13])
+        movie.dom = int(m[14])
+        movie.inter = int(m[15])
+        movie.china = int(m[16])
+        movie.indo = int(m[17])
+        movie.budget = int(m[19])
         movie_list.append(movie)
     return movie_list
 
@@ -99,6 +112,8 @@ class Movie:
         self.genres = ''
         self.budget = 0
         self.director = ''
+        self.cast = ''
+        self.prod = ''
     
     def setChina(self,china):
         self.china = china
@@ -119,7 +134,9 @@ class Movie:
         tbp = ''
         tbp += '['+str(self.date)+' '+get_month(self.month)+' '+str(self.year)+'] '+(self.name)+'\n'
         tbp += 'Studio: '+self.studio+'\n'
+        tbp += 'Production co.: '+self.prod+'\n'
         tbp += 'Director: '+self.director+'\n'
+        tbp += 'Casts: '+self.cast+'\n'
         tbp += 'Rating: '+self.rating+'\n'
         tbp += 'Runtime: '+str(self.runtime)+' minutes\n'
         tbp += 'Genres: '+self.genres+'\n'

@@ -10,7 +10,7 @@ import calendar
 filename = input('Filename (without .csv): ')
 with open(filename+'.csv', 'w' , newline='', encoding = 'ISO-8859-1') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-    wr.writerows([['title','href','year','month','date','studio','director','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
+    wr.writerows([['title','href','year','month','date','studio','prod_co','director','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
 start_time = time.time()
 year = int(input('From year: '))
 until = int(input('Until year: '))
@@ -74,9 +74,34 @@ while year <= until:
             try:
                 dirs = summarys.find('h4', text = re.compile("Director")).find_next_siblings()
                 dirs = list(map(lambda d: d.string, dirs))
-                movie.director = ', '.join(dirs)
+                movie.director = clean_director(', '.join(dirs))
             except:
                 print('No director found for '+movie.name)
+            try:
+                casts = summarys.find('td', class_='castlist_label').find_parent().find_next_siblings()
+                cast_list = []
+                fail_cast = 0
+                for cast in casts:
+                    try:
+                        cast_list.append(cast.find('img').get('alt'))
+                    except:
+                        fail_cast += 1
+                movie.cast = ', '.join(cast_list)
+                if fail_cast > 0:
+                    print('Failed to get '+str(fail_cast)+' cast for '+movie.name)
+            except Exception as e:
+                print(e)
+                print('Failed to get casts for '+movie.name)
+            try:
+                prods = summarys.find('h4', text = 'Production Co:').find_next_siblings()
+                prod_co = []
+                for prod in prods:
+                    if prod.string != None:
+                        prod_co.append(re.sub(r'^ ', '', prod.string))
+                movie.prod = ', '.join(prod_co)
+            except Exception as e:
+                print(e)
+                print('Failed to get production co. for '+movie.name)
             try:
                 movie.rating = titsums.find('span', text = 'MPAA').find_next_sibling().string
             except:
@@ -106,7 +131,7 @@ while year <= until:
             count += 1
             with open(filename+'.csv', 'a' , newline='', encoding = 'ISO-8859-1') as myfile:
                 wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-                wr.writerows([[movie.name,movie.href,movie.year,get_month(movie.month),movie.date,movie.studio,movie.director,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]])
+                wr.writerows([[movie.name,movie.href,movie.year,get_month(movie.month),movie.date,movie.studio,movie.prod,movie.director,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]])
         except Exception as e:
             print(e)
             print('Undefined error for '+moviee.string+'\n')
