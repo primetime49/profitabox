@@ -60,12 +60,25 @@ def find_all_movie(query,ml):
     except:
         return movies
 
+def find_movies_year(ml,year):
+    result = []
+    for m in ml:
+        if m.year == year:
+            result.append(m)
+    return result
+
 def clean_director(director):
     found = re.findall(', \|, [0-9]+ more credit',director)
     if len(found) > 0:
         return director.replace(found[0],'')
     else:
         return director
+
+def csv_header():
+    return [['title','href','year','month','date','studio','prod_co','director','casts','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']]
+
+def csv_movie(movie):
+    return [[movie.name,movie.href,movie.year,get_month(movie.month),movie.date,movie.studio,movie.prod,movie.director,movie.cast,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]]
 
 def local_movies(movie_list):
     return sorted(movie_list,key=lambda m: (m.indo), reverse=True)

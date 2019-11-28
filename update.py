@@ -43,6 +43,7 @@ while year <= until:
         print('Failed to load movies from '+str(year))
         year += 1
         continue
+    movies_year = find_movies_year(movie_list,year)
     for moviee in movies:
         try:
             movie_time = time.time()
@@ -60,6 +61,7 @@ while year <= until:
                 movie_list.append(movie)
             elif dom == movie.dom:
                 print(moviee.string+' has no revenue update\n')
+                movies_year.remove(movie)
                 continue
             try:
                 movie.theater = int(moviee.find_parent().find_next_siblings()[5].string.replace(',',''))
@@ -159,6 +161,10 @@ while year <= until:
             movie.runtime = runtiming(movie.runtime)
             print(movie.name+" --- %s seconds ---\n" % (time.time() - movie_time))
             count += 1
+            try:
+                movies_year.remove(movie)
+            except:
+                pass
         except Exception as e:
             print(e)
             print('Undefined error for '+moviee.string)
@@ -168,16 +174,21 @@ while year <= until:
             except:
                 pass
             print('\n')
-    print('Got '+str(count)+' movies for year '+str(year))
+    print('Successfully updated '+str(count)+' movies for year '+str(year))
+    print('--- Removing '+str(len(movies_year))+' movies from dataset ---')
+    for md in movies_year:
+        print(md.name)
+        movie_list.remove(md)
+    print('------')
     print(str(year)+" --- %s seconds ---\n" % (time.time() - year_time))
     year += 1
 print("Total time --- %s seconds ---" % (time.time() - start_time))
 
 with open(filename, 'w' , newline='', encoding = 'ISO-8859-1') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-    wr.writerows([['title','href','year','month','date','studio','prod_co','director','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
+    wr.writerows(csv_header())
 
 for movie in movie_list:
     with open(filename, 'a' , newline='', encoding = 'ISO-8859-1') as myfile:
         wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-        wr.writerows([[movie.name,movie.href,movie.year,get_month(movie.month),movie.date,movie.studio,movie.prod,movie.director,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]])
+        wr.writerows(csv_movie(movie))

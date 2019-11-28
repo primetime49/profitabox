@@ -10,7 +10,7 @@ import calendar
 filename = input('Filename (without .csv): ')
 with open(filename+'.csv', 'w' , newline='', encoding = 'ISO-8859-1') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-    wr.writerows([['title','href','year','month','date','studio','prod_co','director','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']])
+    wr.writerows(csv_header())
 start_time = time.time()
 year = int(input('From year: '))
 until = int(input('Until year: '))
@@ -131,7 +131,7 @@ while year <= until:
             count += 1
             with open(filename+'.csv', 'a' , newline='', encoding = 'ISO-8859-1') as myfile:
                 wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-                wr.writerows([[movie.name,movie.href,movie.year,get_month(movie.month),movie.date,movie.studio,movie.prod,movie.director,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]])
+                wr.writerows(csv_movie(movie))
         except Exception as e:
             print(e)
             print('Undefined error for '+moviee.string+'\n')
