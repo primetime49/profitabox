@@ -68,7 +68,10 @@ while year <= until:
                 movie.budget = int(BO_number(titsums.find('span', text = 'Budget').find_next_sibling().string))
             except:
                 try:
-                    movie.budget = int(BO_number(re.search('[0-9,]+',summarys.find('h4', text = 'Budget:').find_parent().get_text()).group()))
+                    bud = summarys.find('h4', text = 'Budget:').find_parent().get_text()
+                    curr = re.search('\:[^1-9,]+[1-9]',bud).group()[1:-1]
+                    if curr not in foreign_currs:
+                        movie.budget = int(BO_number(re.search('[0-9,]+',bud).group()))
                 except:
                     print('No budget reported for '+movie.name)
             try:

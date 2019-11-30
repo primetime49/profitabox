@@ -4,6 +4,7 @@ import calendar
 base = "https://www.boxofficemojo.com"
 imdb = "https://www.imdb.com"
 movie_list = []
+foreign_currs = ['KRW', 'INR', 'JPY', 'ESP', 'FRF','THB', 'GBP', 'HKD']
 
 def get_month(month):
     try:
