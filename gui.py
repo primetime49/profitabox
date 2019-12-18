@@ -32,14 +32,23 @@ minYear = 0
 maxYear = 10000
 
 def sortMovies(searchRaw):
+    #searchRaw = clean_list(searchRaw)
     if sortBy == 'Year':
         return sorted(searchRaw,key=lambda m: (m.year,m.month,m.date,m.dom), reverse=desc)
     elif sortBy == 'Domestic':
         return sorted(searchRaw,key=lambda m: (m.dom,m.year), reverse=desc)
     elif sortBy == 'Worldwide':
         return sorted(searchRaw,key=lambda m: (m.getTotal(),m.year), reverse=desc)
+    elif sortBy == 'Budget':
+        temp = sorted(searchRaw,key=lambda m: (m.dom), reverse=True)
+        return sorted(temp,key=lambda m: (m.budget), reverse=desc)
     elif sortBy == 'Profit':
         return sorted(searchRaw,key=lambda m: (m.getProfit(),m.year), reverse=desc)
+    elif sortBy == 'IMDb Rating':
+        return sorted(searchRaw,key=lambda m: (m.score,m.reviews), reverse=desc)
+    elif sortBy == 'Total Reviews':
+        temp = sorted(searchRaw,key=lambda m: (m.dom), reverse=True)
+        return sorted(temp,key=lambda m: (m.reviews), reverse=desc)
 
 def filterMovies(searchRaw):
     newResult = []
@@ -52,6 +61,7 @@ def filterMovies(searchRaw):
 def showMovie(movie):
     title.config(text=movie.name.upper())
     release.config(text='Released on '+str(movie.date)+' '+get_month(movie.month)+' '+str(movie.year)+' by Studio '+movie.studio)
+    review.config(text='IMDb Score: '+str(movie.score)+' by '+str(movie.reviews)+' users ')
     prod.config(text='Made by {}'.format(movie.prod))
     director.config(text='Directed by {}'.format(movie.director))
     cast.config(text='Casts: {}'.format(movie.cast))
@@ -85,7 +95,7 @@ searchEntry.pack(side=LEFT)
 sortFrame = Frame(root)
 sortVar = StringVar(sortFrame)
 
-choices = {'Year','Domestic','Worldwide','Profit'}
+choices = {'Year','Domestic','Worldwide','Budget','Profit','IMDb Rating','Total Reviews'}
 sortVar.set('Year')
 sortMenu = OptionMenu(sortFrame, sortVar, *choices)
 sortMenu.pack(side=LEFT)
@@ -134,6 +144,9 @@ fields.append(title)
 release = Label(root, text='', anchor='w')
 release.pack(fill='both')
 fields.append(release)
+review = Label(root, text='', anchor='w')
+review.pack(fill='both')
+fields.append(review)
 prod = Label(root, text='', anchor='w')
 prod.pack(fill='both')
 fields.append(prod)

@@ -4,7 +4,8 @@ import calendar
 base = "https://www.boxofficemojo.com"
 imdb = "https://www.imdb.com"
 movie_list = []
-foreign_currs = ['KRW', 'INR', 'JPY', 'ESP', 'FRF','THB', 'GBP', 'HKD']
+foreign_currs = ['KRW', 'INR', 'JPY', 'ESP', 'FRF', 'THB', 'HKD', 'NOK', 'IEP', 'DKK', 'DEM', 'SEK', 'CNY', 'ATS']
+punct = ['.', ':', ',', '-']
 
 def get_month(month):
     try:
@@ -14,6 +15,19 @@ def get_month(month):
             return list(calendar.month_name).index(month)
     except:
         return ''
+
+def clean_list(ml):
+    result = []
+    for m in ml:
+        if m.reviews > 0:
+            result.append(m)
+    return result
+
+def clean_title(title):
+    result = title
+    for punc in punct:
+        result = result.replace(punc,'')
+    return result
 
 def BO_number(bo):
     return int(bo.replace('$','').replace(',','').replace('\xa0',''))
@@ -40,7 +54,7 @@ def find_all_movie(query,ml):
     movies = []
     try:
         for m in ml:
-            if query.lower() in m.name.lower():
+            if query.lower() in m.name.lower() or query.lower() in clean_title(m.name.lower()):
                 movies.append(m)
             elif len(query.split(' ')) >= 2:
                 if query.lower() in m.director.lower() or query.lower() in m.studio.lower() or query.lower() in m.cast.lower() or query.lower() in m.prod.lower():
@@ -69,17 +83,17 @@ def find_movies_year(ml,year):
     return result
 
 def clean_director(director):
-    found = re.findall(', \|, [0-9]+ more credit',director)
+    found = re.findall(', \|, [0-9]+ more credit[s]*$',director)
     if len(found) > 0:
         return director.replace(found[0],'')
     else:
         return director
 
 def csv_header():
-    return [['title','href','year','month','date','studio','prod_co','director','casts','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']]
+    return [['title','href','year','month','date','score','reviews','studio','prod_co','director','casts','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']]
 
 def csv_movie(movie):
-    return [[movie.name,movie.href,movie.year,get_month(movie.month),movie.date,movie.studio,movie.prod,movie.director,movie.cast,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]]
+    return [[movie.name,movie.href,movie.year,get_month(movie.month),movie.date,movie.score,movie.reviews,movie.studio,movie.prod,movie.director,movie.cast,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]]
 
 def local_movies(movie_list):
     return sorted(movie_list,key=lambda m: (m.indo), reverse=True)
@@ -90,20 +104,22 @@ def build_list(your_list):
         movie = Movie(m[0],m[1],int(m[2]))
         movie.month = get_month(m[3])
         movie.date = int(m[4])
-        movie.studio = m[5]
-        movie.prod = m[6]
-        movie.director = m[7]
-        movie.cast = m[8]
-        movie.rating = m[9]
-        movie.runtime = int(m[10])
-        movie.genres = m[11]
-        movie.theater = int(m[12])
-        movie.opening = int(m[13])
-        movie.dom = int(m[14])
-        movie.inter = int(m[15])
-        movie.china = int(m[16])
-        movie.indo = int(m[17])
-        movie.budget = int(m[19])
+        movie.score = float(m[5])
+        movie.reviews = int(m[6])
+        movie.studio = m[7]
+        movie.prod = m[8]
+        movie.director = m[9]
+        movie.cast = m[10]
+        movie.rating = m[11]
+        movie.runtime = int(m[12])
+        movie.genres = m[13]
+        movie.theater = int(m[14])
+        movie.opening = int(m[15])
+        movie.dom = int(m[16])
+        movie.inter = int(m[17])
+        movie.china = int(m[18])
+        movie.indo = int(m[19])
+        movie.budget = int(m[21])
         movie_list.append(movie)
     return movie_list
 
@@ -128,6 +144,8 @@ class Movie:
         self.director = ''
         self.cast = ''
         self.prod = ''
+        self.score = 0
+        self.reviews = 0
     
     def setChina(self,china):
         self.china = china
@@ -147,11 +165,12 @@ class Movie:
     def __str__(self):
         tbp = ''
         tbp += '['+str(self.date)+' '+get_month(self.month)+' '+str(self.year)+'] '+(self.name)+'\n'
+        tbp += 'IMDb Score: '+str(self.score)+' by '+str(self.reviews)+' users'
         tbp += 'Studio: '+self.studio+'\n'
         tbp += 'Production co.: '+self.prod+'\n'
         tbp += 'Director: '+self.director+'\n'
         tbp += 'Casts: '+self.cast+'\n'
-        tbp += 'Rating: '+self.rating+'\n'
+        tbp += 'MPAA Rating: '+self.rating+'\n'
         tbp += 'Runtime: '+str(self.runtime)+' minutes\n'
         tbp += 'Genres: '+self.genres+'\n'
         tbp += 'Opening: ${:0,.2f}'.format(self.opening)+'\n'

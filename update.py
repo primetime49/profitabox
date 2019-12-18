@@ -44,10 +44,12 @@ while year <= until:
         year += 1
         continue
     movies_year = find_movies_year(movie_list,year)
+    new_movies = []
+    print(len(movies))
     for moviee in movies:
         try:
             movie_time = time.time()
-            dom = BO_number(moviee.find_parent().find_next_siblings()[4].string)
+            dom = BO_number(moviee.find_parent().find_next_siblings()[3].string)
             if dom < 1000000:
                 print(str(year)+' movie has reached sub-1M')
                 break
@@ -59,20 +61,21 @@ while year <= until:
                 print(moviee.string+' is new movie')
                 movie = Movie(moviee.string, '',year)
                 movie_list.append(movie)
+                new_movies.append(movie)
             elif dom == movie.dom:
                 print(moviee.string+' has no revenue update\n')
                 movies_year.remove(movie)
                 continue
             try:
-                movie.theater = int(moviee.find_parent().find_next_siblings()[5].string.replace(',',''))
+                movie.theater = int(moviee.find_parent().find_next_siblings()[4].string.replace(',',''))
             except:
                 print('No theater count for '+movie.name)
             try:
-                movie.month = list(calendar.month_abbr).index(moviee.find_parent().find_next_siblings()[9].string.split(' ')[0])
+                movie.month = list(calendar.month_abbr).index(moviee.find_parent().find_next_siblings()[8].string.split(' ')[0])
             except:
                 print('No release month for '+movie.name)
             try:
-                movie.date = int(moviee.find_parent().find_next_siblings()[9].string.split(' ')[1])
+                movie.date = int(moviee.find_parent().find_next_siblings()[8].string.split(' ')[1])
             except:
                 print('Failed to get release date for '+movie.name)
             detail = requests.get(base+moviee.get('href'))
@@ -139,6 +142,14 @@ while year <= until:
                 print(e)
                 print('Failed to get production co. for '+movie.name)
             try:
+                movie.score = float(summarys.find('span', itemprop='ratingValue').string)
+            except:
+                print('Failed to get imdb score of '+movie.name)
+            try:
+                movie.reviews = int(summarys.find('span', itemprop='ratingValue').find_parent().find_parent().find_next_sibling().string.replace(',',''))
+            except:
+                print('Failed to get number of reviews for '+movie.name)
+            try:
                 movie.rating = titsums.find('span', text = 'MPAA').find_next_sibling().string
             except:
                 print('No MPAA Rating for '+movie.name)
@@ -172,8 +183,9 @@ while year <= until:
             print(e)
             print('Undefined error for '+moviee.string)
             try:
-                movie_list.remove(movie)
-                print(movie.name+' removed from dataset')
+                if movie in new_movies:
+                    new_movies.remove(movie)
+                    movies_year.append(movie)  
             except:
                 pass
             print('\n')
@@ -182,6 +194,10 @@ while year <= until:
     for md in movies_year:
         print(md.name)
         movie_list.remove(md)
+    print('------')
+    print('--- Got '+str(len(new_movies))+' new movies for year '+str(year)+' ---')
+    for md in new_movies:
+        print(md.name)
     print('------')
     print(str(year)+" --- %s seconds ---\n" % (time.time() - year_time))
     year += 1
