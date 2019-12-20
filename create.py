@@ -31,15 +31,15 @@ while year <= until:
                 continue
             movie = Movie(moviee.string,'',year)
             try:
-                movie.theater = int(moviee.find_parent().find_next_siblings()[5].string.replace(',',''))
+                movie.theater = int(moviee.find_parent().find_next_siblings()[4].string.replace(',',''))
             except:
                 print('No theater count for '+movie.name)
             try:
-                movie.month = list(calendar.month_abbr).index(moviee.find_parent().find_next_siblings()[9].string.split(' ')[0])
+                movie.month = list(calendar.month_abbr).index(moviee.find_parent().find_next_siblings()[8].string.split(' ')[0])
             except:
                 print('No release month for '+movie.name)
             try:
-                movie.date = int(moviee.find_parent().find_next_siblings()[9].string.split(' ')[1])
+                movie.date = int(moviee.find_parent().find_next_siblings()[8].string.split(' ')[1])
             except:
                 print('Failed to get release date for '+movie.name)
             detail = requests.get(base+moviee.get('href'))
@@ -105,6 +105,14 @@ while year <= until:
             except Exception as e:
                 print(e)
                 print('Failed to get production co. for '+movie.name)
+            try:
+                movie.score = float(summarys.find('span', itemprop='ratingValue').string)
+            except:
+                print('Failed to get imdb score of '+movie.name)
+            try:
+                movie.reviews = int(summarys.find('span', itemprop='ratingValue').find_parent().find_parent().find_next_sibling().string.replace(',',''))
+            except:
+                print('Failed to get number of reviews for '+movie.name)
             try:
                 movie.rating = titsums.find('span', text = 'MPAA').find_next_sibling().string
             except:
