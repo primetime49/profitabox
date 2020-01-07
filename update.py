@@ -45,7 +45,6 @@ while year <= until:
         continue
     movies_year = find_movies_year(movie_list,year)
     new_movies = []
-    print(len(movies))
     for moviee in movies:
         try:
             movie_time = time.time()
