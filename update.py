@@ -83,10 +83,10 @@ while year <= until:
             movie.href = re.search('\/[^\/]+\/[^\/]+',href).group()
             titsum = requests.get(base+href)
             titsums = BeautifulSoup(titsum.content, 'html.parser')
-            earnings = titsums.find_all('td', class_='a-text-right a-align-center')
-            movie.dom = BO_number(earnings[0].string)
+            earnings = titsums.find_all('span', class_='a-size-medium a-text-bold')
+            movie.dom = BO_number(earnings[0].findChildren()[0].string)
             try:
-                movie.inter = BO_number(earnings[1].string)
+                movie.inter = BO_number(earnings[1].findChildren()[0].string)
             except:
                 print('No international earnings for '+movie.name)
             try:
