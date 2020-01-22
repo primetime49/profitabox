@@ -60,7 +60,7 @@ def filterMovies(searchRaw):
 
 def showMovie(movie):
     title.config(text=movie.name.upper())
-    release.config(text='Released on '+str(movie.date)+' '+get_month(movie.month)+' '+str(movie.year)+' by Studio '+movie.studio)
+    release.config(text='Released on '+str(movie.date)+' '+get_month(movie.month)+' '+str(movie.year)+' by '+movie.studio)
     review.config(text='IMDb Score: '+str(movie.score)+' by '+str(movie.reviews)+' users ')
     prod.config(text='Made by {}'.format(movie.prod))
     director.config(text='Directed by {}'.format(movie.director))
@@ -135,7 +135,7 @@ syLabel.pack(side=LEFT)
 mxyEntry = Entry(yearFrame, width = 5)
 mxyEntry.pack(side=LEFT)
 
-filterButton = Button(root, text='Filter', command=lambda:filterTC())
+filterButton = Button(root, text='Filter', command=lambda:getMovies(showed))
 filterButton.pack()
 
 title = Label(root, text='', anchor='w')
@@ -220,8 +220,6 @@ def filterTC():
     else:
         maxYear = 10000
     
-    getMovies(showed)
-
 # link function to change dropdown
 sortVar.trace('w', change_dropdown)
 dirVar.trace('w', change_dropdown)
@@ -233,6 +231,7 @@ def getMovies(showed):
     search = searchEntry.get()
     searchRaw = find_all_movie(search, movie_list)
     searchResult = sortMovies(searchRaw)
+    filterTC()
     searchResult = filterMovies(searchResult)
     maxShow = 10+showed
     while showed < maxShow and showed < len(searchResult):
