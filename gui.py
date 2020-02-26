@@ -30,11 +30,14 @@ maxTC = 10000
 desc = True
 minYear = 0
 maxYear = 10000
+monthVal = 'All'
 
 def sortMovies(searchRaw):
     #searchRaw = clean_list(searchRaw)
     if sortBy == 'Year':
         return sorted(searchRaw,key=lambda m: (m.year,m.month,m.date,m.dom), reverse=desc)
+    elif sortBy == 'Opening':
+        return sorted(searchRaw,key=lambda m: (m.opening,m.dom), reverse=desc)
     elif sortBy == 'Domestic':
         return sorted(searchRaw,key=lambda m: (m.dom,m.year), reverse=desc)
     elif sortBy == 'Worldwide':
@@ -55,7 +58,8 @@ def filterMovies(searchRaw):
     for sr in searchRaw:
         if sr.theater >= minTC and sr.theater <= maxTC:
             if sr.year >= minYear and sr.year <= maxYear:
-                newResult.append(sr)
+                 if monthVal == 'All' or monthVal == get_month(sr.month):
+                      newResult.append(sr)
     return newResult
 
 def showMovie(movie):
@@ -93,15 +97,15 @@ searchEntry = Entry(searchFrame, width =50)
 searchEntry.pack(side=LEFT)
 
 sortFrame = Frame(root)
-sortVar = StringVar(sortFrame)
 
-choices = {'Year','Domestic','Worldwide','Budget','Profit','IMDb Rating','Total Reviews'}
+sortVar = StringVar(sortFrame)
+choices = ['Year','Opening','Domestic','Worldwide','Budget','Profit','IMDb Rating','Total Reviews']
 sortVar.set('Year')
 sortMenu = OptionMenu(sortFrame, sortVar, *choices)
 sortMenu.pack(side=LEFT)
 
 dirVar = StringVar(sortFrame)
-choices = {'UP', 'DOWN'}
+choices = ['UP', 'DOWN']
 dirVar.set('DOWN')
 dirMenu = OptionMenu(sortFrame, dirVar, *choices)
 dirMenu.pack(side=LEFT)
@@ -134,6 +138,16 @@ syLabel = Label(yearFrame, text=' - ', anchor='w')
 syLabel.pack(side=LEFT)
 mxyEntry = Entry(yearFrame, width = 5)
 mxyEntry.pack(side=LEFT)
+
+monthFrame = Frame(root)
+monthFrame.pack()
+monthLabel = Label(monthFrame, text='Release month:', anchor='w')
+monthLabel.pack(side=LEFT)
+monthVar = StringVar(monthFrame)
+choices = ['All', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+monthVar.set('All')
+monthMenu = OptionMenu(monthFrame, monthVar, *choices)
+monthMenu.pack()
 
 filterButton = Button(root, text='Filter', command=lambda:getMovies(showed))
 filterButton.pack()
@@ -200,7 +214,7 @@ def change_dropdown(*args):
     getMovies(showed)
 
 def filterTC():
-    global minTC, maxTC, minYear, maxYear
+    global minTC, maxTC, minYear, maxYear, monthVal
 
     if minEntry.get().isdigit():
         minTC = int(minEntry.get())
@@ -219,6 +233,8 @@ def filterTC():
         maxYear = int(mxyEntry.get())
     else:
         maxYear = 10000
+
+    monthVal = monthVar.get()
     
 # link function to change dropdown
 sortVar.trace('w', change_dropdown)
