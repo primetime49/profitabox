@@ -82,6 +82,8 @@ def showMovie(movie):
     profit.config(text='Profit: ${:0,.2f}'.format(movie.getProfit()))
     if movie.getProfit() < 0:
         profit.config(fg="red")
+    elif movie.getProfit() > 0:
+        profit.config(fg="green")
     else:
         profit.config(fg="black")
     
