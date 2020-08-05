@@ -7,24 +7,24 @@ This dataset is comprised of movies general data, e.g. Title, Director, Runtime,
 ### Prerequisites
 1. [Python 3](https://https://www.python.org/downloads/)
 
-### Steps (Recommended to just do step 1 and 4)
+### How to run
 1. Install requirements
 ```
 pip install -r requirements.txt
 ```
-#### OPTIONAL - Create dataset from scratch
-2. Init dataset
+2. Run GUI (using the pre-built dataset I've provided in here)
+```
+python gui.py
+```
+
+#### OPTIONAL - If you want to try building the dataset from scratch
+1. Init dataset
 ```
 python create.py
 ```
-3. Update dataset regularly, if you want. (I usually update them weekly and only for this year's movies)
+2. Update dataset regularly, if you want. (I usually update them weekly and only for this year's movies)
 ```
 python update.py
-```
-#### RECOMMENDED - Use existing dataset (routinely updated)
-4. Run GUI
-```
-python gui.py
 ```
 
 ### Acknowledgements:
