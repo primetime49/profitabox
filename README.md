@@ -6,7 +6,7 @@ This dataset is comprised of movies general data, e.g. Title, Director, Runtime,
 
 ### Prerequisites
 1. Git (duh)
-2. [Python 3](https://https://www.python.org/downloads/)
+2. [Python 3+](https://https://www.python.org/downloads/)
 
 ### How to run
 1. Clone and go to the directory
