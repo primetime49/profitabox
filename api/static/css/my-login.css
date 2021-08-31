@@ -18,6 +18,12 @@ body.my-login-page {
 	z-index: 1;
 }
 
+.logo-brand {
+	margin: auto;
+  	width: 50%;
+	padding: 10px;
+}
+
 .my-login-page .brand img {
 	width: 100%;
 }
