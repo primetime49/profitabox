@@ -3,7 +3,7 @@ import re
 import calendar
 
 # import json
-from json import JSONEncoder
+# from json import JSONEncoder
 
 base = "https://www.boxofficemojo.com"
 imdb = "https://www.imdb.com"
