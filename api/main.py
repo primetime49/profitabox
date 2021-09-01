@@ -1,4 +1,5 @@
 # save this as main.py
+from types import MethodType
 from flask import Flask, render_template, redirect, url_for, request
 # from flask import make_response, jsonify
 # import json
@@ -14,6 +15,7 @@ from pathlib import Path
 import base
 from api import database
 from api import query
+from api import call
 
 app = Flask(__name__, static_url_path='', static_folder='static')
 
@@ -37,6 +39,16 @@ def search_movies():
     response['data'] = []
     return jsonpickle.encode(query.search(request, response, movie_list))
 
+@app.route(routing + "user")
+def check_user():
+    return call.sync_cloud()
+
+@app.route(routing + "login", methods=["POST"])
+def login_user():
+    response = call.login_cloud(request.form.get('username')
+    , request.form.get('password'))
+    return response
+
 @app.route("/hello")
 def hello():
     return "Hello, World!"
@@ -46,7 +58,7 @@ def home_view():
     return "<h1>Welcome to Geeks for Geeks</h1>"
 
 @app.route("/index")
-def index():
+def index():  
     return render_template('index.html')
 
 @app.route('/', defaults={'path': ''})
