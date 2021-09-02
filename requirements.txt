@@ -1,2 +1,7 @@
 bs4
+flask
 requests
+flask-sqlalchemy
+flask-login
+werkzeug
+pandas
