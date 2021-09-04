@@ -1,3 +1,7 @@
 bs4
 requests
 Flask
+flask-sqlalchemy
+flask-login
+werkzeug
+pandas
