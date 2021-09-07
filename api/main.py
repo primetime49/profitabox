@@ -35,7 +35,8 @@ routing = "/api/v1/"
 def load_user(user_id): #reload user object from the user ID stored in the session
     # since the user_id is just the primary key of our user table, use it in the query for the user
     # return models.User.query.get(int(user_id))
-    return models.User("1", "asd@asd", "asd", "asd")
+    # return models.User("1", "asd@asd", "asd", "asd")
+    return product.get_profile(user_id)
 
 @app.route(routing + "movies")
 def get_movies():
@@ -74,6 +75,12 @@ def hello():
 def home_view():
     return "<h1>Welcome to Geeks for Geeks</h1>"
 
+@app.route("/list")
+def home():
+    if current_user.is_authenticated:
+        return render_template('list.html', name=current_user.email)        
+    return render_template('list.html')
+
 @app.route("/index", methods=['GET', 'POST']) # define login page path
 def index(): # define login page fucntion
     # return "It Works"
@@ -86,10 +93,10 @@ def index(): # define login page fucntion
         password = request.form.get('password')
         remember = True if request.form.get('remember') else False
         response = product.login_web(email, password)
-        print(response)
+        # print(response)
         user = models.User(
-            response["data"]["userId"],
             response["data"]["email"],
+            response["data"]["userId"],
             response["data"]["password"],
             response["data"]["username"]
             )
@@ -105,7 +112,8 @@ def index(): # define login page fucntion
         #     return redirect(url_for('auth.login')) # if the user doesn't exist or password is wrong, reload the page
         # if the above check passes, then we know the user has the right credentials
         login_user(user, remember=remember)
-        return redirect(url_for('profile'))
+        # return redirect(url_for('profile'))
+        return redirect(url_for('home'))
 
 @app.route('/signup', methods=['GET', 'POST'])# we define the sign up path
 def signup(): # define the sign up function
@@ -154,4 +162,6 @@ def catch_all(path):
     if test_file.is_file():
     # if os.path.isfile("templates/" + path + ".html"):
         return render_template(path + '.html')
-    return redirect(url_for('index')) 
+    # return redirect(url_for('index')) 
+    # return redirect(url_for('list')) 
+    return redirect(url_for('home')) 
