@@ -5,3 +5,4 @@ flask-sqlalchemy
 flask-login
 werkzeug
 pandas
+gunicorn
