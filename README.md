@@ -22,6 +22,10 @@ pip install -r requirements.txt
 ```
 python gui.py
 ```
+4. Run WebServer (API / BE and FE still combined)
+```
+flask run
+```
 
 #### OPTIONAL - If you want to try building the dataset from scratch
 1. Init dataset
@@ -36,5 +40,6 @@ python update.py
 ### Acknowledgements:
 - https://www.boxofficemojo.com/
 - https://www.crummy.com/software/BeautifulSoup/
+- https://github.com/nauvalazhar/my-login
 
 If you have any questions or feedback, just contact [me](mailto:adityo.anggraito@gmail.com) :)

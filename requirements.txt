@@ -1,6 +1,6 @@
 bs4
-flask
 requests
+Flask
 flask-sqlalchemy
 flask-login
 werkzeug

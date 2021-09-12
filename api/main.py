@@ -1,4 +1,5 @@
 # save this as main.py
+from types import MethodType
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user, login_user, logout_user
 from werkzeug.security import generate_password_hash
@@ -17,6 +18,9 @@ import os
 
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import base
+from api import database
+from api import query
+from api import call
 import csv
 from flask_login import LoginManager
 
@@ -41,31 +45,30 @@ def load_user(user_id): #reload user object from the user ID stored in the sessi
 @app.route(routing + "movies")
 def get_movies():
     response = {}
-    current_path = Path(__file__).parent.resolve()
-    with open(str(current_path) + "/../movies_raw_v2.csv", 'r'
-    , encoding = 'ISO-8859-1') as f:
-        reader = csv.reader(f)
-        your_list = list(reader)
-    movie_list = base.build_list(your_list)
+    movie_list = base.build_list(database.connect_data())
     response['data'] = []
     # print(movie_list)
     # return response
     # return make_response(jsonify(response))
     # return json.dumps(vars(response))
-    page = request.args.get('page')
-    page_size =  request.args.get('pageSize')
-    if page is None or page == "":
-        page = 0
-    else:
-        page = int(page)
-    if page_size is None or page_size == "":
-        page_size = 25
-    else:
-        page_size = int(page_size)    
-    for i in range(0, page+1):
-        for j in range(i*page_size, i*page_size+page_size):
-            response['data'].append(movie_list[j])
-    return jsonpickle.encode(response)
+    return jsonpickle.encode(query.pagination(request, response, movie_list))
+
+@app.route(routing + "search")
+def search_movies():
+    response = {}
+    movie_list = base.build_list(database.connect_data())
+    response['data'] = []
+    return jsonpickle.encode(query.search(request, response, movie_list))
+
+@app.route(routing + "user")
+def check_user():
+    return call.sync_cloud()
+
+@app.route(routing + "login", methods=["POST"])
+def login_user():
+    response = call.login_cloud(request.form.get('username')
+    , request.form.get('password'))
+    return response
 
 @app.route("/hello")
 def hello():
