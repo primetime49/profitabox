@@ -1,6 +1,10 @@
 from bs4 import BeautifulSoup
 import re
 import calendar
+
+# import json
+from json import JSONEncoder
+
 base = "https://www.boxofficemojo.com"
 imdb = "https://www.imdb.com"
 movie_list = []
@@ -184,3 +188,33 @@ class Movie:
         tbp += 'Profit: ${:0,.2f}'.format(self.getProfit())+'\n'
         tbp += '------'
         return tbp
+
+    def toJSON(self):
+        tbp = {}
+        tbp['metadata'] = '['+str(self.date)+' '+get_month(self.month)+' '+str(self.year)+'] '+(self.name)+'\n'
+        tbp['IMDb Score: '] = str(self.score)+' by '+str(self.reviews)+' users'
+        tbp['Studio: '] = self.studio+'\n'
+        tbp['Production co.: '] = self.prod+'\n'
+        tbp['Director: '] = self.director+'\n'
+        tbp['Casts: '] = self.cast+'\n'
+        tbp['MPAA Rating: '] = self.rating+'\n'
+        tbp['Runtime: '] = str(self.runtime)+' minutes\n'
+        tbp['Genres: '] = self.genres+'\n'
+        tbp['Opening: '] = '${:0,.2f}'.format(self.opening)+'\n'
+        tbp['Theater: '] = str(self.theater)+'\n'
+        tbp['Domestic: '] = '${:0,.2f}'.format(self.dom)+'\n'
+        tbp['Foregin (ex. China): '] = '${:0,.2f}'.format(self.inter)+'\n'
+        tbp['China: '] = '${:0,.2f}'.format(self.china)+'\n'
+        tbp['Indonesia: '] = '${:0,.2f}'.format(self.indo)+'\n'
+        tbp['Total: '] = '${:0,.2f}'.format(self.dom+self.inter+self.china)+'\n'
+        tbp['Budget: '] = '${:0,.2f}'.format(self.budget)+'\n'
+        tbp['Profit: '] = '${:0,.2f}'.format(self.getProfit())+'\n'
+        return tbp
+        # return self.message # or how you want it to be serialized
+
+
+    # def toJSON(self):
+    #     return json.dumps(self, default=lambda o: o.__dict__, 
+    #         sort_keys=True, indent=4)
+
+    
