@@ -33,16 +33,10 @@ def BO_number(bo):
     return int(bo.replace('$','').replace(',','').replace('\xa0',''))
 
 def runtiming(runtime):
-    num = re.findall('[0-9]+',runtime)
-    if 'hr' in runtime:
-        if 'min' in runtime:
-            return 60*int(num[0])+int(num[1])
-        else:
-            return 60*int(num[0])
-    else:
-        if 'min' in runtime:
-            return int(num[0])
-    return 0
+    try:
+        return int(runtime)
+    except:
+        return 0
 
 def find_movie(name,year, movies):
     for movie in movies:

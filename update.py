@@ -49,6 +49,8 @@ while year <= until:
     for moviee in movies:
         try:
             movie_time = time.time()
+
+            # DOMESTIC BO
             dom = BO_number(moviee.find_parent().find_next_siblings()[3].string)
             if dom < 1000000:
                 print(str(year)+' movie has reached sub-1M')
@@ -66,18 +68,25 @@ while year <= until:
                 print(moviee.string+' has no revenue update\n')
                 movies_year.remove(movie)
                 continue
+
+            # MAX THEATER COUNT
             try:
                 movie.theater = int(moviee.find_parent().find_next_siblings()[4].string.replace(',',''))
             except:
                 print('No theater count for '+movie.name)
+            
+            # RELEASE MONTH
             try:
                 movie.month = list(calendar.month_abbr).index(moviee.find_parent().find_next_siblings()[8].string.split(' ')[0])
             except:
                 print('No release month for '+movie.name)
+            
+            # RELEASE DATE
             try:
                 movie.date = int(moviee.find_parent().find_next_siblings()[8].string.split(' ')[1])
             except:
                 print('Failed to get release date for '+movie.name)
+            
             detail = requests.get(base+moviee.get('href'))
             details = BeautifulSoup(detail.content, 'html.parser')
             href = details.find(class_='a-link-normal mojo-title-link refiner-display-highlight').get('href')
@@ -86,14 +95,20 @@ while year <= until:
             titsums = BeautifulSoup(titsum.content, 'html.parser')
             earnings = titsums.find_all('span', class_='a-size-medium a-text-bold')
             movie.dom = BO_number(earnings[0].findChildren()[0].string)
+
+            # INTERNATIONAL BO
             try:
                 movie.inter = BO_number(earnings[1].findChildren()[0].string)
             except:
                 print('No international earnings for '+movie.name)
+            
+            # DISTRIBUTOR
             try:
                 movie.studio = titsums.find('span', text = 'Domestic Distributor').find_next_sibling().get_text().split('See')[0]
             except:
                 print('No Distributing studio for '+movie.name)
+            
+            # OPENING BO
             try:
                 movie.opening = int(BO_number(titsums.find('span', text = 'Domestic Opening').find_next_sibling().string))
             except:
@@ -164,19 +179,24 @@ while year <= until:
             except:
                 print('No genres found for '+movie.name)
             
-            
             release = titsums.find(text = 'Original Release').find_parent().get('value')
             releasee = requests.get(base+release)
             releases = BeautifulSoup(releasee.content, 'html.parser')
+
+            # CHINA BO
             try:
                 movie.setChina(int(BO_number(releases.find('a', text='China').find_parent().find_next_siblings()[2].string)))
             except:
                 print('No china release for '+movie.name)
+            
+            # INDONESIA BO
             try:
                 movie.indo = int(BO_number(releases.find('a', text='Indonesia').find_parent().find_next_siblings()[2].string))
             except:
                 print('No indonesia release for '+movie.name)
-            #movie.runtime = runtiming(movie.runtime)
+
+            movie.runtime = runtiming(movie.runtime)
+
             print(movie.name+" --- %s seconds ---\n" % (time.time() - movie_time))
             count += 1
             try:
