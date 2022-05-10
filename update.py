@@ -7,6 +7,7 @@ import csv
 import time
 import glob
 import calendar
+import json
 
 files = [f for f in glob.glob('*.csv')]
 filenames = []
@@ -97,69 +98,73 @@ while year <= until:
                 movie.opening = int(BO_number(titsums.find('span', text = 'Domestic Opening').find_next_sibling().string))
             except:
                 print('No opening numbers for '+movie.name)
-            summary = requests.get(imdb+href)
-            summarys = BeautifulSoup(summary.content, 'html.parser')
+            
+            # IMDB API
+            imdb_url = imdb+href.split('/')[2]
+            payload = {}
+            headers= {}
+            clean = json.loads(requests.request("GET", imdb_url, headers=headers, data = payload).text)
+            
+            # BUDGET
             try:
-                movie.budget = int(BO_number(titsums.find('span', text = 'Budget').find_next_sibling().string))
+                movie.budget = int(BO_number(clean['boxOffice']['budget'].split(' (')[0]))
             except:
-                try:
-                    bud = summarys.find('h4', text = 'Budget:').find_parent().get_text()
-                    curr = re.search('\:[^1-9,]+[1-9]',bud).group()[1:-1]
-                    if curr not in foreign_currs:
-                        movie.budget = int(BO_number(re.search('[0-9,]+',bud).group()))
-                except:
-                    print('No budget reported for '+movie.name)
+                print('No budget reported for '+movie.name)
+            
+            # DIRECTOR
             try:
-                dirs = summarys.find('h4', text = re.compile("Director")).find_next_siblings()
-                dirs = list(map(lambda d: d.string, dirs))
-                movie.director = clean_director(', '.join(dirs))
+                movie.director = clean['directors']
             except:
                 print('No director found for '+movie.name)
+                
+            # CAST
             try:
-                casts = summarys.find('td', class_='castlist_label').find_parent().find_next_siblings()
                 cast_list = []
-                fail_cast = 0
-                for cast in casts:
-                    try:
-                        cast_list.append(cast.find('img').get('alt'))
-                    except:
-                        fail_cast += 1
+                for a in clean['actorList']:
+                    cast_list.append(a['name'])
                 movie.cast = ', '.join(cast_list)
-                if fail_cast > 0:
-                    print('Failed to get '+str(fail_cast)+' cast for '+movie.name)
             except Exception as e:
                 print(e)
                 print('Failed to get casts for '+movie.name)
+            
+            # PRODUCTION CO.
             try:
-                prods = summarys.find('h4', text = 'Production Co:').find_next_siblings()
-                prod_co = []
-                for prod in prods:
-                    if prod.string != None:
-                        prod_co.append(re.sub(r'^ ', '', prod.string))
-                movie.prod = ', '.join(prod_co)
+                movie.prod = clean['companies']
             except Exception as e:
                 print(e)
                 print('Failed to get production co. for '+movie.name)
+                
+            # IMDB SCORE
             try:
-                movie.score = float(summarys.find('span', itemprop='ratingValue').string)
+                movie.score = float(clean['imDbRating'])
             except:
                 print('Failed to get imdb score of '+movie.name)
+            
+            # IMDB REVIEW COUNT
             try:
-                movie.reviews = int(summarys.find('span', itemprop='ratingValue').find_parent().find_parent().find_next_sibling().string.replace(',',''))
+                movie.reviews = int(clean['imDbRatingVotes'])
             except:
                 print('Failed to get number of reviews for '+movie.name)
+            
+            # MPAA RATING
             try:
-                movie.rating = titsums.find('span', text = 'MPAA').find_next_sibling().string
+                movie.rating = clean['contentRating']
             except:
                 print('No MPAA Rating for '+movie.name)
+                
+            # RUNTIME
             try:
-                movie.runtime = titsums.find('span', text = 'Running Time').find_next_sibling().string
+                movie.runtime = clean['runtimeMins']
             except:
                 print('No runtime found for '+movie.name)
+            
+            # GENRES
             try:
-                movie.genres = re.sub(r'\s+',' ',titsums.find('span', text = 'Genres').find_next_sibling().string.replace('\n',''))
+                movie.genres = clean['genres']
             except:
                 print('No genres found for '+movie.name)
+            
+            
             release = titsums.find(text = 'Original Release').find_parent().get('value')
             releasee = requests.get(base+release)
             releases = BeautifulSoup(releasee.content, 'html.parser')
@@ -171,7 +176,7 @@ while year <= until:
                 movie.indo = int(BO_number(releases.find('a', text='Indonesia').find_parent().find_next_siblings()[2].string))
             except:
                 print('No indonesia release for '+movie.name)
-            movie.runtime = runtiming(movie.runtime)
+            #movie.runtime = runtiming(movie.runtime)
             print(movie.name+" --- %s seconds ---\n" % (time.time() - movie_time))
             count += 1
             try:

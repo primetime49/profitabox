@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import re
 import calendar
 base = "https://www.boxofficemojo.com"
-imdb = "https://www.imdb.com"
+imdb = "https://imdb-api.com/en/API/Title/k_4uo2qur8/"
 movie_list = []
 foreign_currs = ['KRW', 'INR', 'JPY', 'ESP', 'FRF', 'THB', 'HKD', 'NOK', 'IEP', 'DKK', 'DEM', 'SEK', 'CNY', 'ATS', 'ITL']
 punct = ['.', ':', ',', '-']
@@ -111,7 +111,10 @@ def build_list(your_list):
         movie.director = m[9]
         movie.cast = m[10]
         movie.rating = m[11]
-        movie.runtime = int(m[12])
+        try:
+            movie.runtime = int(m[12])
+        except:
+            pass
         movie.genres = m[13]
         movie.theater = int(m[14])
         movie.opening = int(m[15])
