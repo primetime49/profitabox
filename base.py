@@ -1,8 +1,13 @@
 from bs4 import BeautifulSoup
 import re
 import calendar
+imdb = "https://imdb-api.com/en/API/Title/"
+with open('api_key.txt', 'r') as f:
+    key = f.readlines()[0]
+    imdb = imdb + key + '/'
+    
 base = "https://www.boxofficemojo.com"
-imdb = "https://imdb-api.com/en/API/Title/k_4uo2qur8/"
+
 movie_list = []
 foreign_currs = ['KRW', 'INR', 'JPY', 'ESP', 'FRF', 'THB', 'HKD', 'NOK', 'IEP', 'DKK', 'DEM', 'SEK', 'CNY', 'ATS', 'ITL']
 punct = ['.', ':', ',', '-']
