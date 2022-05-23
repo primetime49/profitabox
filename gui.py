@@ -12,14 +12,13 @@ for f in files:
     print(str(filenum)+'. '+f)
     filenames.append(f)
 
-filename = input('Choose data source (1/2/3/...): ')
-while not filename.isdigit():
+data_source = input('Choose data source (1/2/3/...): ')
+while not data_source.isdigit():
     print('please input valid data source')
-    filename = input('Choose data source (1/2/3/...): ')
+    data_source = input('Choose data source (1/2/3/...): ')
 
-filename = int(filename)
-filename = filenames[filename-1]
-with open(filename, 'r', encoding = 'ISO-8859-1') as f:
+filename = filenames[int(data_source) - 1]
+with open(filename, 'r', encoding='ISO-8859-1') as f:
     reader = csv.reader(f)
     your_list = list(reader)
 
@@ -37,40 +36,45 @@ minYear = 0
 maxYear = 10000
 monthVal = 'All'
 
+
 def sortMovies(searchRaw):
     #searchRaw = clean_list(searchRaw)
     if sortBy == 'Year':
-        return sorted(searchRaw,key=lambda m: (m.year,m.month,m.date,m.dom), reverse=desc)
+        return sorted(searchRaw, key=lambda m: (m.year, m.month, m.date, m.dom), reverse=desc)
     elif sortBy == 'Opening':
-        return sorted(searchRaw,key=lambda m: (m.opening,m.dom), reverse=desc)
+        return sorted(searchRaw, key=lambda m: (m.opening, m.dom), reverse=desc)
     elif sortBy == 'Domestic':
-        return sorted(searchRaw,key=lambda m: (m.dom,m.year), reverse=desc)
+        return sorted(searchRaw, key=lambda m: (m.dom, m.year), reverse=desc)
     elif sortBy == 'Worldwide':
-        return sorted(searchRaw,key=lambda m: (m.getTotal(),m.year), reverse=desc)
+        return sorted(searchRaw, key=lambda m: (m.getTotal(), m.year), reverse=desc)
     elif sortBy == 'Budget':
-        temp = sorted(searchRaw,key=lambda m: (m.dom), reverse=True)
-        return sorted(temp,key=lambda m: (m.budget), reverse=desc)
+        temp = sorted(searchRaw, key=lambda m: (m.dom), reverse=True)
+        return sorted(temp, key=lambda m: (m.budget), reverse=desc)
     elif sortBy == 'Profit':
-        return sorted(searchRaw,key=lambda m: (m.getProfit(),m.year), reverse=desc)
+        return sorted(searchRaw, key=lambda m: (m.getProfit(), m.year), reverse=desc)
     elif sortBy == 'IMDb Rating':
-        return sorted(searchRaw,key=lambda m: (m.score,m.reviews), reverse=desc)
+        return sorted(searchRaw, key=lambda m: (m.score, m.reviews), reverse=desc)
     elif sortBy == 'Total Reviews':
-        temp = sorted(searchRaw,key=lambda m: (m.dom), reverse=True)
-        return sorted(temp,key=lambda m: (m.reviews), reverse=desc)
+        temp = sorted(searchRaw, key=lambda m: (m.dom), reverse=True)
+        return sorted(temp, key=lambda m: (m.reviews), reverse=desc)
+
 
 def filterMovies(searchRaw):
     newResult = []
     for sr in searchRaw:
         if sr.theater >= minTC and sr.theater <= maxTC:
             if sr.year >= minYear and sr.year <= maxYear:
-                 if monthVal == 'All' or monthVal == get_month(sr.month):
-                      newResult.append(sr)
+                if monthVal == 'All' or monthVal == get_month(sr.month):
+                    newResult.append(sr)
     return newResult
+
 
 def showMovie(movie):
     title.config(text=movie.name.upper())
-    release.config(text='Released on '+str(movie.date)+' '+get_month(movie.month)+' '+str(movie.year)+' by '+movie.studio)
-    review.config(text='IMDb Score: '+str(movie.score)+' by '+str(movie.reviews)+' users ')
+    release.config(text='Released on '+str(movie.date)+' ' +
+                   get_month(movie.month)+' '+str(movie.year)+' by '+movie.studio)
+    review.config(text='IMDb Score: '+str(movie.score) +
+                  ' by '+str(movie.reviews)+' users ')
     prod.config(text='Made by {}'.format(movie.prod))
     director.config(text='Directed by {}'.format(movie.director))
     cast.config(text='Casts: {}'.format(movie.cast))
@@ -82,7 +86,8 @@ def showMovie(movie):
     inter.config(text='Foregin (ex. China): ${:0,.2f}'.format(movie.inter))
     china.config(text='China: ${:0,.2f}'.format(movie.china))
     indo.config(text='Indonesia: ${:0,.2f}'.format(movie.indo))
-    total.config(text='Total: ${:0,.2f}'.format(movie.dom+movie.inter+movie.china))
+    total.config(text='Total: ${:0,.2f}'.format(
+        movie.dom+movie.inter+movie.china))
     budget.config(text='Budget: ${:0,.2f}'.format(movie.budget))
     profit.config(text='Profit: ${:0,.2f}'.format(movie.getProfit()))
     if movie.getProfit() < 0:
@@ -91,22 +96,25 @@ def showMovie(movie):
         profit.config(fg="green")
     else:
         profit.config(fg="black")
-    
+
+
 def emptyPage():
     for field in fields:
-        field.config(text = '')
+        field.config(text='')
+
 
 searchLabel = Label(root, text='Enter the movie:')
 searchLabel.pack()
 searchFrame = Frame(root)
 searchFrame.pack()
-searchEntry = Entry(searchFrame, width =50)
+searchEntry = Entry(searchFrame, width=50)
 searchEntry.pack(side=LEFT)
 
 sortFrame = Frame(root)
 
 sortVar = StringVar(sortFrame)
-choices = ['Year','Opening','Domestic','Worldwide','Budget','Profit','IMDb Rating','Total Reviews']
+choices = ['Year', 'Opening', 'Domestic', 'Worldwide',
+           'Budget', 'Profit', 'IMDb Rating', 'Total Reviews']
 sortVar.set('Year')
 sortMenu = OptionMenu(sortFrame, sortVar, *choices)
 sortMenu.pack(side=LEFT)
@@ -117,7 +125,8 @@ dirVar.set('DOWN')
 dirMenu = OptionMenu(sortFrame, dirVar, *choices)
 dirMenu.pack(side=LEFT)
 
-searchButt = Button(searchFrame, text='SEARCH', command=lambda:getMovies(showed))
+searchButt = Button(searchFrame, text='SEARCH',
+                    command=lambda: getMovies(showed))
 searchButt.pack(side=LEFT)
 
 sortLabel = Label(root, text='Sort by:')
@@ -128,22 +137,22 @@ filterFrame = Frame(root)
 filterFrame.pack()
 minLabel = Label(filterFrame, text='Theaters count:', anchor='w')
 minLabel.pack(side=LEFT)
-minEntry = Entry(filterFrame, width = 5)
+minEntry = Entry(filterFrame, width=5)
 minEntry.pack(side=LEFT)
 stripLabel = Label(filterFrame, text=' - ', anchor='w')
 stripLabel.pack(side=LEFT)
-maxEntry = Entry(filterFrame, width = 5)
+maxEntry = Entry(filterFrame, width=5)
 maxEntry.pack(side=LEFT)
 
 yearFrame = Frame(root)
 yearFrame.pack()
 yearLabel = Label(yearFrame, text='Release year:', anchor='w')
 yearLabel.pack(side=LEFT)
-mnyEntry = Entry(yearFrame, width = 5)
+mnyEntry = Entry(yearFrame, width=5)
 mnyEntry.pack(side=LEFT)
 syLabel = Label(yearFrame, text=' - ', anchor='w')
 syLabel.pack(side=LEFT)
-mxyEntry = Entry(yearFrame, width = 5)
+mxyEntry = Entry(yearFrame, width=5)
 mxyEntry.pack(side=LEFT)
 
 monthFrame = Frame(root)
@@ -151,12 +160,13 @@ monthFrame.pack()
 monthLabel = Label(monthFrame, text='Release month:', anchor='w')
 monthLabel.pack(side=LEFT)
 monthVar = StringVar(monthFrame)
-choices = ['All', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+choices = ['All', 'January', 'February', 'March', 'April', 'May', 'June',
+           'July', 'August', 'September', 'October', 'November', 'December']
 monthVar.set('All')
 monthMenu = OptionMenu(monthFrame, monthVar, *choices)
 monthMenu.pack()
 
-filterButton = Button(root, text='Filter', command=lambda:getMovies(showed))
+filterButton = Button(root, text='Filter', command=lambda: getMovies(showed))
 filterButton.pack()
 
 title = Label(root, text='', anchor='w')
@@ -211,6 +221,7 @@ profit = Label(root, text='', anchor='w')
 profit.pack(fill='both')
 fields.append(profit)
 
+
 def change_dropdown(*args):
     global sortBy, desc
     sortBy = sortVar.get()
@@ -219,6 +230,7 @@ def change_dropdown(*args):
     else:
        desc = False
     getMovies(showed)
+
 
 def filterTC():
     global minTC, maxTC, minYear, maxYear, monthVal
@@ -231,7 +243,7 @@ def filterTC():
         maxTC = int(maxEntry.get())
     else:
         maxTC = 10000
-    
+
     if mnyEntry.get().isdigit():
         minYear = int(mnyEntry.get())
     else:
@@ -242,10 +254,12 @@ def filterTC():
         maxYear = 10000
 
     monthVal = monthVar.get()
-    
+
+
 # link function to change dropdown
 sortVar.trace('w', change_dropdown)
 dirVar.trace('w', change_dropdown)
+
 
 def getMovies(showed):
     emptyPage()
@@ -259,18 +273,22 @@ def getMovies(showed):
     maxShow = 10+showed
     while showed < maxShow and showed < len(searchResult):
         movie = searchResult[showed]
-        movieButton = Button(root, text=movie.name, command=lambda movie=movie:showMovie(movie), )
+        movieButton = Button(root, text=movie.name,
+                             command=lambda movie=movie: showMovie(movie), )
         movieButton.pack()
         buttons.append(movieButton)
         showed += 1
     if len(searchResult) > showed:
-        nextPage = Button(root, text='Next page', command=lambda showed=showed:getMovies(showed), )
+        nextPage = Button(root, text='Next page',
+                          command=lambda showed=showed: getMovies(showed), )
         nextPage.pack(side=RIGHT)
         buttons.append(nextPage)
     if showed > 10:
-        prevPage = Button(root, text='Previous page', command=lambda showed=maxShow-20:getMovies(showed), )
+        prevPage = Button(root, text='Previous page',
+                          command=lambda showed=maxShow-20: getMovies(showed), )
         prevPage.pack(side=LEFT)
         buttons.append(prevPage)
+
 
 searchEntry.bind('<Return>', lambda event: getMovies(showed))
 root.mainloop()
