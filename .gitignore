@@ -2,3 +2,5 @@
 *.pyc
 
 api_key.txt
+
+/venv
