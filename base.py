@@ -5,12 +5,14 @@ imdb = "https://imdb-api.com/en/API/Title/"
 with open('api_key.txt', 'r') as f:
     key = f.readlines()[0]
     imdb = imdb + key + '/'
-    
+
 base = "https://www.boxofficemojo.com"
 
 movie_list = []
-foreign_currs = ['KRW', 'INR', 'JPY', 'ESP', 'FRF', 'THB', 'HKD', 'NOK', 'IEP', 'DKK', 'DEM', 'SEK', 'CNY', 'ATS', 'ITL']
+foreign_currs = ['KRW', 'INR', 'JPY', 'ESP', 'FRF', 'THB',
+                 'HKD', 'NOK', 'IEP', 'DKK', 'DEM', 'SEK', 'CNY', 'ATS', 'ITL']
 punct = ['.', ':', ',', '-']
+
 
 def get_month(month):
     try:
@@ -21,6 +23,7 @@ def get_month(month):
     except:
         return ''
 
+
 def clean_list(ml):
     result = []
     for m in ml:
@@ -28,14 +31,17 @@ def clean_list(ml):
             result.append(m)
     return result
 
+
 def clean_title(title):
     result = title
     for punc in punct:
-        result = result.replace(punc,'')
+        result = result.replace(punc, '')
     return result
 
+
 def BO_number(bo):
-    return int(bo.replace('$','').replace(',','').replace('\xa0',''))
+    return int(bo.replace('$', '').replace(',', '').replace('\xa0', ''))
+
 
 def runtiming(runtime):
     try:
@@ -43,13 +49,15 @@ def runtiming(runtime):
     except:
         return 0
 
-def find_movie(name,year, movies):
+
+def find_movie(name, year, movies):
     for movie in movies:
         if movie.name == name and movie.year == year:
             return movie
-    return Movie('','',0)
+    return Movie('', '', 0)
 
-def find_all_movie(query,ml):
+
+def find_all_movie(query, ml):
     movies = []
     try:
         for m in ml:
@@ -59,48 +67,54 @@ def find_all_movie(query,ml):
                 if query.lower() in m.director.lower() or query.lower() in m.studio.lower() or query.lower() in m.cast.lower() or query.lower() in m.prod.lower():
                     movies.append(m)
             else:
-                if query.lower() in list(map(lambda d: d.lower(), m.director.replace(',','').split(' '))):
+                if query.lower() in list(map(lambda d: d.lower(), m.director.replace(',', '').split(' '))):
                     movies.append(m)
-                elif query.lower() in list(map(lambda d: d.lower(), m.cast.replace(',','').split(' '))):
+                elif query.lower() in list(map(lambda d: d.lower(), m.cast.replace(',', '').split(' '))):
                     movies.append(m)
-                elif query.lower() in list(map(lambda d: d.lower(), m.prod.replace(',','').split(' '))):
+                elif query.lower() in list(map(lambda d: d.lower(), m.prod.replace(',', '').split(' '))):
                     movies.append(m)
                 elif query.lower() in list(map(lambda s: s.lower(), m.studio.split(' '))):
                     movies.append(m)
                 elif query.lower() in list(map(lambda g: g.lower(), m.genres.split(' '))):
                     movies.append(m)
-            
+
         return movies
     except:
         return movies
 
-def find_movies_year(ml,year):
+
+def find_movies_year(ml, year):
     result = []
     for m in ml:
         if m.year == year:
             result.append(m)
     return result
 
+
 def clean_director(director):
-    found = re.findall(', \|, [0-9]+ more credit[s]*$',director)
+    found = re.findall(', \|, [0-9]+ more credit[s]*$', director)
     if len(found) > 0:
-        return director.replace(found[0],'')
+        return director.replace(found[0], '')
     else:
         return director
 
+
 def csv_header():
-    return [['title','href','year','month','date','score','reviews','studio','prod_co','director','casts','rating','runtime','genres','theater_count','opening','domestic','foreign (ex. china)','china','indonesia','total','budget','profit']]
+    return [['title', 'href', 'year', 'month', 'date', 'score', 'reviews', 'studio', 'prod_co', 'director', 'casts', 'rating', 'runtime', 'genres', 'theater_count', 'opening', 'domestic', 'foreign (ex. china)', 'china', 'indonesia', 'total', 'budget', 'profit']]
+
 
 def csv_movie(movie):
-    return [[movie.name,movie.href,movie.year,get_month(movie.month),movie.date,movie.score,movie.reviews,movie.studio,movie.prod,movie.director,movie.cast,movie.rating,movie.runtime,movie.genres,movie.theater,movie.opening,movie.dom,movie.inter,movie.china,movie.indo,movie.getTotal(),movie.budget,movie.getProfit()]]
+    return [[movie.name, movie.href, movie.year, get_month(movie.month), movie.date, movie.score, movie.reviews, movie.studio, movie.prod, movie.director, movie.cast, movie.rating, movie.runtime, movie.genres, movie.theater, movie.opening, movie.dom, movie.inter, movie.china, movie.indo, movie.getTotal(), movie.budget, movie.getProfit()]]
+
 
 def local_movies(movie_list):
-    return sorted(movie_list,key=lambda m: (m.indo), reverse=True)
+    return sorted(movie_list, key=lambda m: (m.indo), reverse=True)
+
 
 def build_list(your_list):
     movie_list = []
     for m in your_list[1:]:
-        movie = Movie(m[0],m[1],int(m[2]))
+        movie = Movie(m[0], m[1], int(m[2]))
         movie.month = get_month(m[3])
         movie.date = int(m[4])
         movie.score = float(m[5])
@@ -125,6 +139,7 @@ def build_list(your_list):
         movie_list.append(movie)
     return movie_list
 
+
 class Movie:
     def __init__(self, name, href, year):
         self.name = name
@@ -148,11 +163,11 @@ class Movie:
         self.prod = ''
         self.score = 0
         self.reviews = 0
-    
-    def setChina(self,china):
+
+    def setChina(self, china):
         self.china = china
         self.inter -= china
-    
+
     def getProfit(self):
         if self.budget != 0:
             rev = 0.5*self.dom
@@ -161,12 +176,14 @@ class Movie:
             return rev-self.budget
         else:
             return 0
+
     def getTotal(self):
         return self.dom+self.inter+self.china
-        
+
     def __str__(self):
         tbp = ''
-        tbp += '['+str(self.date)+' '+get_month(self.month)+' '+str(self.year)+'] '+(self.name)+'\n'
+        tbp += '['+str(self.date)+' '+get_month(self.month) + \
+            ' '+str(self.year)+'] '+(self.name)+'\n'
         tbp += 'IMDb Score: '+str(self.score)+' by '+str(self.reviews)+' users'
         tbp += 'Studio: '+self.studio+'\n'
         tbp += 'Production co.: '+self.prod+'\n'

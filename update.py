@@ -1,6 +1,5 @@
 from base import *
 from bs4 import BeautifulSoup
-import urllib
 import requests
 import re
 import csv
@@ -20,7 +19,7 @@ for f in files:
 
 filename = int(input('Choose data source (1/2/3/...): '))
 filename = filenames[filename-1]
-with open(filename, 'r', encoding = 'ISO-8859-1') as f:
+with open(filename, 'r', encoding='ISO-8859-1') as f:
     reader = csv.reader(f)
     your_list = list(reader)
 
@@ -36,7 +35,8 @@ while year <= until:
     soup = ''
     movies = ''
     try:
-        page = requests.get("https://www.boxofficemojo.com/year/"+str(year)+'/?grossesOption=totalGrosses')
+        page = requests.get("https://www.boxofficemojo.com/year/" +
+                            str(year)+'/?grossesOption=totalGrosses')
         soup = BeautifulSoup(page.content, 'html.parser')
         movies = soup.find_all(href=re.compile("/release"))
     except Exception as e:
@@ -44,24 +44,25 @@ while year <= until:
         print('Failed to load movies from '+str(year))
         year += 1
         continue
-    movies_year = find_movies_year(movie_list,year)
+    movies_year = find_movies_year(movie_list, year)
     new_movies = []
     for moviee in movies:
         try:
             movie_time = time.time()
 
             # DOMESTIC BO
-            dom = BO_number(moviee.find_parent().find_next_siblings()[3].string)
+            dom = BO_number(
+                moviee.find_parent().find_next_siblings()[3].string)
             if dom < 1000000:
                 print(str(year)+' movie has reached sub-1M')
                 break
             if moviee.find_next_sibling() != None:
                 print(moviee.string+' is re-release\n')
                 continue
-            movie = find_movie(moviee.string,year,movie_list)
+            movie = find_movie(moviee.string, year, movie_list)
             if movie.name == '':
                 print(moviee.string+' is new movie')
-                movie = Movie(moviee.string, '',year)
+                movie = Movie(moviee.string, '', year)
                 movie_list.append(movie)
                 new_movies.append(movie)
             elif dom == movie.dom:
@@ -71,29 +72,34 @@ while year <= until:
 
             # MAX THEATER COUNT
             try:
-                movie.theater = int(moviee.find_parent().find_next_siblings()[4].string.replace(',',''))
+                movie.theater = int(moviee.find_parent().find_next_siblings()[
+                                    4].string.replace(',', ''))
             except:
                 print('No theater count for '+movie.name)
-            
+
             # RELEASE MONTH
             try:
-                movie.month = list(calendar.month_abbr).index(moviee.find_parent().find_next_siblings()[8].string.split(' ')[0])
+                movie.month = list(calendar.month_abbr).index(
+                    moviee.find_parent().find_next_siblings()[8].string.split(' ')[0])
             except:
                 print('No release month for '+movie.name)
-            
+
             # RELEASE DATE
             try:
-                movie.date = int(moviee.find_parent().find_next_siblings()[8].string.split(' ')[1])
+                movie.date = int(moviee.find_parent().find_next_siblings()[
+                                 8].string.split(' ')[1])
             except:
                 print('Failed to get release date for '+movie.name)
-            
+
             detail = requests.get(base+moviee.get('href'))
             details = BeautifulSoup(detail.content, 'html.parser')
-            href = details.find(class_='a-link-normal mojo-title-link refiner-display-highlight').get('href')
-            movie.href = re.search('\/[^\/]+\/[^\/]+',href).group()
+            href = details.find(
+                class_='a-link-normal mojo-title-link refiner-display-highlight').get('href')
+            movie.href = re.search('\/[^\/]+\/[^\/]+', href).group()
             titsum = requests.get(base+href)
             titsums = BeautifulSoup(titsum.content, 'html.parser')
-            earnings = titsums.find_all('span', class_='a-size-medium a-text-bold')
+            earnings = titsums.find_all(
+                'span', class_='a-size-medium a-text-bold')
             movie.dom = BO_number(earnings[0].findChildren()[0].string)
 
             # INTERNATIONAL BO
@@ -101,37 +107,41 @@ while year <= until:
                 movie.inter = BO_number(earnings[1].findChildren()[0].string)
             except:
                 print('No international earnings for '+movie.name)
-            
+
             # DISTRIBUTOR
             try:
-                movie.studio = titsums.find('span', text = 'Domestic Distributor').find_next_sibling().get_text().split('See')[0]
+                movie.studio = titsums.find(
+                    'span', text='Domestic Distributor').find_next_sibling().get_text().split('See')[0]
             except:
                 print('No Distributing studio for '+movie.name)
-            
+
             # OPENING BO
             try:
-                movie.opening = int(BO_number(titsums.find('span', text = 'Domestic Opening').find_next_sibling().string))
+                movie.opening = int(BO_number(titsums.find(
+                    'span', text='Domestic Opening').find_next_sibling().string))
             except:
                 print('No opening numbers for '+movie.name)
-            
+
             # IMDB API
             imdb_url = imdb+href.split('/')[2]
             payload = {}
-            headers= {}
-            clean = json.loads(requests.request("GET", imdb_url, headers=headers, data = payload).text)
-            
+            headers = {}
+            clean = json.loads(requests.request(
+                "GET", imdb_url, headers=headers, data=payload).text)
+
             # BUDGET
             try:
-                movie.budget = int(BO_number(clean['boxOffice']['budget'].split(' (')[0]))
+                movie.budget = int(
+                    BO_number(clean['boxOffice']['budget'].split(' (')[0]))
             except:
                 print('No budget reported for '+movie.name)
-            
+
             # DIRECTOR
             try:
                 movie.director = clean['directors']
             except:
                 print('No director found for '+movie.name)
-                
+
             # CAST
             try:
                 cast_list = []
@@ -141,63 +151,67 @@ while year <= until:
             except Exception as e:
                 print(e)
                 print('Failed to get casts for '+movie.name)
-            
+
             # PRODUCTION CO.
             try:
                 movie.prod = clean['companies']
             except Exception as e:
                 print(e)
                 print('Failed to get production co. for '+movie.name)
-                
+
             # IMDB SCORE
             try:
                 movie.score = float(clean['imDbRating'])
             except:
                 print('Failed to get imdb score of '+movie.name)
-            
+
             # IMDB REVIEW COUNT
             try:
                 movie.reviews = int(clean['imDbRatingVotes'])
             except:
                 print('Failed to get number of reviews for '+movie.name)
-            
+
             # MPAA RATING
             try:
                 movie.rating = clean['contentRating']
             except:
                 print('No MPAA Rating for '+movie.name)
-                
+
             # RUNTIME
             try:
                 movie.runtime = clean['runtimeMins']
             except:
                 print('No runtime found for '+movie.name)
-            
+
             # GENRES
             try:
                 movie.genres = clean['genres']
             except:
                 print('No genres found for '+movie.name)
-            
-            release = titsums.find(text = 'Original Release').find_parent().get('value')
+
+            release = titsums.find(
+                text='Original Release').find_parent().get('value')
             releasee = requests.get(base+release)
             releases = BeautifulSoup(releasee.content, 'html.parser')
 
             # CHINA BO
             try:
-                movie.setChina(int(BO_number(releases.find('a', text='China').find_parent().find_next_siblings()[2].string)))
+                movie.setChina(int(BO_number(releases.find(
+                    'a', text='China').find_parent().find_next_siblings()[2].string)))
             except:
                 print('No china release for '+movie.name)
-            
+
             # INDONESIA BO
             try:
-                movie.indo = int(BO_number(releases.find('a', text='Indonesia').find_parent().find_next_siblings()[2].string))
+                movie.indo = int(BO_number(releases.find(
+                    'a', text='Indonesia').find_parent().find_next_siblings()[2].string))
             except:
                 print('No indonesia release for '+movie.name)
 
             movie.runtime = runtiming(movie.runtime)
 
-            print(movie.name+" --- %s seconds ---\n" % (time.time() - movie_time))
+            print(movie.name+" --- %s seconds ---\n" %
+                  (time.time() - movie_time))
             count += 1
             try:
                 movies_year.remove(movie)
@@ -209,7 +223,7 @@ while year <= until:
             try:
                 if movie in new_movies:
                     new_movies.remove(movie)
-                    movies_year.append(movie)  
+                    movies_year.append(movie)
             except:
                 pass
             print('\n')
@@ -219,7 +233,8 @@ while year <= until:
         print(md.name)
         movie_list.remove(md)
     print('------')
-    print('--- Got '+str(len(new_movies))+' new movies for year '+str(year)+' ---')
+    print('--- Got '+str(len(new_movies)) +
+          ' new movies for year '+str(year)+' ---')
     for md in new_movies:
         print(md.name)
     print('------')
@@ -227,11 +242,11 @@ while year <= until:
     year += 1
 print("Total time --- %s seconds ---" % (time.time() - start_time))
 
-with open(filename, 'w' , newline='', encoding = 'ISO-8859-1') as myfile:
+with open(filename, 'w', newline='', encoding='ISO-8859-1') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
     wr.writerows(csv_header())
 
 for movie in movie_list:
-    with open(filename, 'a' , newline='', encoding = 'ISO-8859-1') as myfile:
+    with open(filename, 'a', newline='', encoding='ISO-8859-1') as myfile:
         wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
         wr.writerows(csv_movie(movie))

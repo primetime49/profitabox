@@ -6,7 +6,6 @@ import re
 import csv
 import time
 import glob
-import calendar
 import json
 
 files = [f for f in glob.glob('*.csv')]
@@ -20,7 +19,7 @@ for f in files:
 
 filename = int(input('Choose data source (1/2/3/...): '))
 filename = filenames[filename-1]
-with open(filename, 'r', encoding = 'ISO-8859-1') as f:
+with open(filename, 'r', encoding='ISO-8859-1') as f:
     reader = csv.reader(f)
     your_list = list(reader)
 
@@ -36,7 +35,8 @@ while year <= until:
     soup = ''
     movies = ''
     try:
-        page = requests.get("https://www.boxofficemojo.com/year/"+str(year)+'/?grossesOption=totalGrosses')
+        page = requests.get("https://www.boxofficemojo.com/year/" +
+                            str(year)+'/?grossesOption=totalGrosses')
         soup = BeautifulSoup(page.content, 'html.parser')
         movies = soup.find_all(href=re.compile("/release"))
     except Exception as e:
@@ -44,47 +44,50 @@ while year <= until:
         print('Failed to load movies from '+str(year))
         year += 1
         continue
-    movies_year = find_movies_year(movie_list,year)
+    movies_year = find_movies_year(movie_list, year)
     new_movies = []
     for moviee in movies:
         try:
             movie_time = time.time()
 
             # DOMESTIC BO
-            dom = BO_number(moviee.find_parent().find_next_siblings()[3].string)
+            dom = BO_number(
+                moviee.find_parent().find_next_siblings()[3].string)
             if dom < 1000000:
                 print(str(year)+' movie has reached sub-1M')
                 break
             if moviee.find_next_sibling() != None:
                 print(moviee.string+' is re-release\n')
                 continue
-            movie = find_movie(moviee.string,year,movie_list)
+            movie = find_movie(moviee.string, year, movie_list)
             if movie.name == '':
                 print(moviee.string+' is new movie')
-                movie = Movie(moviee.string, '',year)
+                movie = Movie(moviee.string, '', year)
                 movie_list.append(movie)
                 new_movies.append(movie)
-            
+
             href = movie.href
-            
+
             # IMDB API
             imdb_url = imdb+href.split('/')[2]
             payload = {}
-            headers= {}
-            clean = json.loads(requests.request("GET", imdb_url, headers=headers, data = payload).text)
-            
+            headers = {}
+            clean = json.loads(requests.request(
+                "GET", imdb_url, headers=headers, data=payload).text)
+
             # BUDGET
             try:
-                movie.budget = int(BO_number(clean['boxOffice']['budget'].split(' (')[0]))
+                movie.budget = int(
+                    BO_number(clean['boxOffice']['budget'].split(' (')[0]))
             except:
                 print('No budget reported for '+movie.name)
-            
+
             # DIRECTOR
             try:
                 movie.director = clean['directors']
             except:
                 print('No director found for '+movie.name)
-                
+
             # CAST
             try:
                 cast_list = []
@@ -94,38 +97,38 @@ while year <= until:
             except Exception as e:
                 print(e)
                 print('Failed to get casts for '+movie.name)
-            
+
             # PRODUCTION CO.
             try:
                 movie.prod = clean['companies']
             except Exception as e:
                 print(e)
                 print('Failed to get production co. for '+movie.name)
-                
+
             # IMDB SCORE
             try:
                 movie.score = float(clean['imDbRating'])
             except:
                 print('Failed to get imdb score of '+movie.name)
-            
+
             # IMDB REVIEW COUNT
             try:
                 movie.reviews = int(clean['imDbRatingVotes'])
             except:
                 print('Failed to get number of reviews for '+movie.name)
-            
+
             # MPAA RATING
             try:
                 movie.rating = clean['contentRating']
             except:
                 print('No MPAA Rating for '+movie.name)
-                
+
             # RUNTIME
             try:
                 movie.runtime = clean['runtimeMins']
             except:
                 print('No runtime found for '+movie.name)
-            
+
             # GENRES
             try:
                 movie.genres = clean['genres']
@@ -134,7 +137,8 @@ while year <= until:
 
             movie.runtime = runtiming(movie.runtime)
 
-            print(movie.name+" --- %s seconds ---\n" % (time.time() - movie_time))
+            print(movie.name+" --- %s seconds ---\n" %
+                  (time.time() - movie_time))
             count += 1
             try:
                 movies_year.remove(movie)
@@ -146,7 +150,7 @@ while year <= until:
             try:
                 if movie in new_movies:
                     new_movies.remove(movie)
-                    movies_year.append(movie)  
+                    movies_year.append(movie)
             except:
                 pass
             print('\n')
@@ -156,7 +160,8 @@ while year <= until:
         print(md.name)
         movie_list.remove(md)
     print('------')
-    print('--- Got '+str(len(new_movies))+' new movies for year '+str(year)+' ---')
+    print('--- Got '+str(len(new_movies)) +
+          ' new movies for year '+str(year)+' ---')
     for md in new_movies:
         print(md.name)
     print('------')
@@ -164,11 +169,11 @@ while year <= until:
     year += 1
 print("Total time --- %s seconds ---" % (time.time() - start_time))
 
-with open(filename, 'w' , newline='', encoding = 'ISO-8859-1') as myfile:
+with open(filename, 'w', newline='', encoding='ISO-8859-1') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
     wr.writerows(csv_header())
 
 for movie in movie_list:
-    with open(filename, 'a' , newline='', encoding = 'ISO-8859-1') as myfile:
+    with open(filename, 'a', newline='', encoding='ISO-8859-1') as myfile:
         wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
         wr.writerows(csv_movie(movie))
