@@ -14,6 +14,7 @@ for f in files:
 
 filename = input('Choose data source (1/2/3/...): ')
 while not filename.isdigit():
+    print('please input valid data source')
     filename = input('Choose data source (1/2/3/...): ')
 
 filename = int(filename)
