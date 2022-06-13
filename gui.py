@@ -12,7 +12,9 @@ for f in files:
     print(str(filenum)+'. '+f)
     filenames.append(f)
 
-filename = int(input('Choose data source (1/2/3/...): '))
+filename = 0
+if len(filenames) > 1:
+    filename = int(input('Choose data source (1/2/3/...): '))
 filename = filenames[filename-1]
 with open(filename, 'r', encoding = 'ISO-8859-1') as f:
     reader = csv.reader(f)
@@ -21,6 +23,12 @@ with open(filename, 'r', encoding = 'ISO-8859-1') as f:
 movie_list = build_list(your_list)
 
 root = Tk()
+
+# Make default fullscreen with toolbar
+width= root.winfo_screenwidth()
+height= root.winfo_screenheight()
+root.geometry("%dx%d" % (width, height))
+
 buttons = []
 fields = []
 showed = 0
@@ -69,6 +77,7 @@ def showMovie(movie):
     prod.config(text='Made by {}'.format(movie.prod))
     director.config(text='Directed by {}'.format(movie.director))
     cast.config(text='Casts: {}'.format(movie.cast))
+    genre.config(text='Genres: {}'.format(movie.genres))
     rating.config(text='MPAA Rating: {}'.format(movie.rating))
     runtime.config(text='Runtime: {} minutes'.format(movie.runtime))
     theater.config(text='Max theaters count: {}'.format(movie.theater))
@@ -172,6 +181,9 @@ fields.append(director)
 cast = Label(root, text='', anchor='w')
 cast.pack(fill='both')
 fields.append(cast)
+genre = Label(root, text='', anchor='w')
+genre.pack(fill='both')
+fields.append(genre)
 rating = Label(root, text='', anchor='w')
 rating.pack(fill='both')
 fields.append(rating)

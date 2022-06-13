@@ -18,7 +18,9 @@ for f in files:
     print(str(filenum)+'. '+f)
     filenames.append(f)
 
-filename = int(input('Choose data source (1/2/3/...): '))
+filename = 0
+if len(filenames) > 1:
+    filename = int(input('Choose data source (1/2/3/...): '))
 filename = filenames[filename-1]
 with open(filename, 'r', encoding = 'ISO-8859-1') as f:
     reader = csv.reader(f)
