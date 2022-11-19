@@ -67,7 +67,7 @@ def find_all_movie(query,ml):
                     movies.append(m)
                 elif query.lower() in list(map(lambda s: s.lower(), m.studio.split(' '))):
                     movies.append(m)
-                elif query.lower() in list(map(lambda g: g.lower(), m.genres.split(' '))):
+                elif query.lower() in list(map(lambda g: g.lower(), m.genres.replace(',','').split(' '))):
                     movies.append(m)
             
         return movies
