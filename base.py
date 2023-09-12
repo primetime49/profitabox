@@ -14,6 +14,11 @@ imdb_headers = {
 	"X-RapidAPI-Key": ra_key,
 	"X-RapidAPI-Host": "imdb8.p.rapidapi.com"
 }
+
+mda_headers = {
+    "X-RapidAPI-Key": ra_key,
+    "X-RapidAPI-Host": "movie-database-alternative.p.rapidapi.com"
+}
     
 base = "https://www.boxofficemojo.com"
 

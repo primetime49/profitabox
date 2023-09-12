@@ -120,10 +120,7 @@ while year <= until:
             imdb_url = imdb_1
             querystring = {"r":"json","i":href.split('/')[2]}
             payload = {}
-            headers = {
-                "X-RapidAPI-Key": "sJvwXYGlfCmshRTL7dlc5PfHvTCMp1CNpt5jsngmNMc9y8e40h",
-                "X-RapidAPI-Host": "movie-database-alternative.p.rapidapi.com"
-            }
+            headers = mda_headers
             clean = json.loads(requests.request("GET", imdb_url, headers=headers, params=querystring).text)
             
             # DIRECTOR
