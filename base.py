@@ -1,10 +1,19 @@
 from bs4 import BeautifulSoup
 import re
 import calendar
-imdb = "https://imdb-api.com/en/API/Title/"
+imdb_1 = "https://movie-database-alternative.p.rapidapi.com/"
+imdb_2 = "https://imdb8.p.rapidapi.com/title/v2/get-business"
+imdb_3 = "https://imdb8.p.rapidapi.com/title/get-full-credits"
+imdb_4 = "https://imdb8.p.rapidapi.com/title/get-company-credits"
+
+ra_key = ''
 with open('api_key.txt', 'r') as f:
-    key = f.readlines()[0]
-    imdb = imdb + key + '/'
+    ra_key = f.readlines()[0]
+
+imdb_headers = {
+	"X-RapidAPI-Key": ra_key,
+	"X-RapidAPI-Host": "imdb8.p.rapidapi.com"
+}
     
 base = "https://www.boxofficemojo.com"
 

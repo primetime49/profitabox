@@ -24,6 +24,13 @@ movie_list = build_list(your_list)
 
 root = Tk()
 
+# set window title
+root.title('Profitabox')
+
+# set window icon
+img = PhotoImage(file='icon_v5.png')
+root.wm_iconphoto(True, img)
+
 # Make default fullscreen with toolbar
 width= root.winfo_screenwidth()
 height= root.winfo_screenheight()

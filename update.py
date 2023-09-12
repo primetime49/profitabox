@@ -116,70 +116,101 @@ while year <= until:
             except:
                 print('No opening numbers for '+movie.name)
             
-            # IMDB API
-            imdb_url = imdb+href.split('/')[2]
+            # IMDB API (1)
+            imdb_url = imdb_1
+            querystring = {"r":"json","i":href.split('/')[2]}
             payload = {}
-            headers= {}
-            clean = json.loads(requests.request("GET", imdb_url, headers=headers, data = payload).text)
-            
-            # BUDGET
-            try:
-                movie.budget = int(BO_number(clean['boxOffice']['budget'].split(' (')[0]))
-            except:
-                print('No budget reported for '+movie.name)
+            headers = {
+                "X-RapidAPI-Key": "sJvwXYGlfCmshRTL7dlc5PfHvTCMp1CNpt5jsngmNMc9y8e40h",
+                "X-RapidAPI-Host": "movie-database-alternative.p.rapidapi.com"
+            }
+            clean = json.loads(requests.request("GET", imdb_url, headers=headers, params=querystring).text)
             
             # DIRECTOR
             try:
-                movie.director = clean['directors']
+                movie.director = clean['Director']
             except:
                 print('No director found for '+movie.name)
                 
-            # CAST
-            try:
-                cast_list = []
-                for a in clean['actorList']:
-                    cast_list.append(a['name'])
-                movie.cast = ', '.join(cast_list)
-            except Exception as e:
-                print(e)
-                print('Failed to get casts for '+movie.name)
-            
-            # PRODUCTION CO.
-            try:
-                movie.prod = clean['companies']
-            except Exception as e:
-                print(e)
-                print('Failed to get production co. for '+movie.name)
-                
             # IMDB SCORE
             try:
-                movie.score = float(clean['imDbRating'])
+                movie.score = float(clean['imdbRating'])
             except:
                 print('Failed to get imdb score of '+movie.name)
             
             # IMDB REVIEW COUNT
             try:
-                movie.reviews = int(clean['imDbRatingVotes'])
+                movie.reviews = int(clean['imdbVotes'].replace(',',''))
             except:
                 print('Failed to get number of reviews for '+movie.name)
             
             # MPAA RATING
             try:
-                movie.rating = clean['contentRating']
+                movie.rating = clean['Rated']
             except:
                 print('No MPAA Rating for '+movie.name)
                 
             # RUNTIME
             try:
-                movie.runtime = clean['runtimeMins']
+                movie.runtime = clean['Runtime'].split(' ')[0]
             except:
                 print('No runtime found for '+movie.name)
             
             # GENRES
             try:
-                movie.genres = clean['genres']
+                movie.genres = clean['Genre']
             except:
                 print('No genres found for '+movie.name)
+
+            # IMDB API (2)
+            # BUDGET
+            try:
+                if movie.budget == 0:
+                    imdb_url = imdb_2
+                    querystring = {"tconst":href.split('/')[2]}
+                    payload = {}
+                    headers = imdb_headers
+                    clean = json.loads(requests.request("GET", imdb_url, headers=headers, params=querystring).text)
+                    
+                    movie.budget = int(clean['titleBoxOffice']['budget']['amount'])
+                else:
+                    print('Budget already exists')
+            except:
+                print('No budget reported for '+movie.name)
+
+            # IMDB API (3)
+            # CAST
+            try:
+                if movie.cast == '':
+                    imdb_url = imdb_3
+                    querystring = {"tconst":href.split('/')[2]}
+                    payload = {}
+                    headers = imdb_headers
+                    clean = json.loads(requests.request("GET", imdb_url, headers=headers, params=querystring).text)
+
+                    movie.cast = ', '.join([c['name'] for c in clean['cast'][:20]])
+                else:
+                    print('Cast already exists')
+            except Exception as e:
+                print(e)
+                print('Failed to get casts for '+movie.name)
+            
+            # IMDB API (4)
+            # PRODUCTION CO.
+            try:
+                if movie.prod == '':
+                    imdb_url = imdb_4
+                    querystring = {"tconst":href.split('/')[2]}
+                    payload = {}
+                    headers = imdb_headers
+                    clean = json.loads(requests.request("GET", imdb_url, headers=headers, params=querystring).text)
+
+                    movie.prod = ', '.join([c['rowTitle'] for c in clean['categories'][0]['section']['items']])
+                else:
+                    print('Prod compaines already exist')
+            except Exception as e:
+                print(e)
+                print('Failed to get production co. for '+movie.name)
             
             release = titsums.find(text = 'Original Release').find_parent().get('value')
             releasee = requests.get(base+release)
