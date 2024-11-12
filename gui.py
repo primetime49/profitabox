@@ -63,7 +63,7 @@ def sortMovies(searchRaw):
     elif sortBy == 'Profit':
         return sorted(searchRaw,key=lambda m: (m.getProfit(),m.year), reverse=desc)
     elif sortBy == 'IMDb Rating':
-        return sorted(searchRaw,key=lambda m: (m.score,m.reviews), reverse=desc)
+        return sorted((s for s in searchRaw if s.reviews >= 100_000),key=lambda m: (m.score,m.reviews), reverse=desc)
     elif sortBy == 'Total Reviews':
         temp = sorted(searchRaw,key=lambda m: (m.dom), reverse=True)
         return sorted(temp,key=lambda m: (m.reviews), reverse=desc)
@@ -90,7 +90,7 @@ def showMovie(movie):
     theater.config(text='Max theaters count: {}'.format(movie.theater))
     opening.config(text='Opening: ${:0,.2f}'.format(movie.opening))
     dom.config(text='Domestic: ${:0,.2f}'.format(movie.dom))
-    inter.config(text='Foregin (ex. China): ${:0,.2f}'.format(movie.inter))
+    inter.config(text='International: ${:0,.2f}'.format(movie.inter+movie.china))
     china.config(text='China: ${:0,.2f}'.format(movie.china))
     indo.config(text='Indonesia: ${:0,.2f}'.format(movie.indo))
     total.config(text='Total: ${:0,.2f}'.format(movie.dom+movie.inter+movie.china))
@@ -101,6 +101,7 @@ def showMovie(movie):
     elif movie.getProfit() > 0:
         profit.config(fg="green")
     else:
+        profit.config(text='Revenue: ${:0,.2f}'.format(movie.getRev()))
         profit.config(fg="black")
     
 def emptyPage():

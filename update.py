@@ -106,13 +106,13 @@ while year <= until:
             
             # DISTRIBUTOR
             try:
-                movie.studio = titsums.find('span', text = 'Domestic Distributor').find_next_sibling().get_text().split('See')[0]
+                movie.studio = titsums.find('span', string = 'Domestic Distributor').find_next_sibling().get_text().split('See')[0]
             except:
                 print('No Distributing studio for '+movie.name)
             
             # OPENING BO
             try:
-                movie.opening = int(BO_number(titsums.find('span', text = 'Domestic Opening').find_next_sibling().string))
+                movie.opening = int(BO_number(titsums.find('span', string = 'Domestic Opening').find_next_sibling().string))
             except:
                 print('No opening numbers for '+movie.name)
             
@@ -209,19 +209,19 @@ while year <= until:
                 print(e)
                 print('Failed to get production co. for '+movie.name)
             
-            release = titsums.find(text = 'Original Release').find_parent().get('value')
+            release = titsums.find(string = 'Original Release').find_parent().get('value')
             releasee = requests.get(base+release)
             releases = BeautifulSoup(releasee.content, 'html.parser')
 
             # CHINA BO
             try:
-                movie.setChina(int(BO_number(releases.find('a', text='China').find_parent().find_next_siblings()[2].string)))
+                movie.setChina(int(BO_number(releases.find('a', string='China').find_parent().find_next_siblings()[2].string)))
             except:
                 print('No china release for '+movie.name)
             
             # INDONESIA BO
             try:
-                movie.indo = int(BO_number(releases.find('a', text='Indonesia').find_parent().find_next_siblings()[2].string))
+                movie.indo = int(BO_number(releases.find('a', string='Indonesia').find_parent().find_next_siblings()[2].string))
             except:
                 print('No indonesia release for '+movie.name)
 

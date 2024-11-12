@@ -175,6 +175,13 @@ class Movie:
             return rev-self.budget
         else:
             return 0
+
+    def getRev(self):
+        rev = 0.5*self.dom
+        rev += 0.4*self.inter
+        rev += 0.25*self.china
+        return rev
+        
     def getTotal(self):
         return self.dom+self.inter+self.china
         
